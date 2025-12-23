@@ -14,6 +14,11 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
+import { loadStripe } from "@stripe/stripe-js";
+import { Elements } from "@stripe/react-stripe-js";
+import CheckoutForm from "@/components/CheckoutForm";
+
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
 const serviceChargeMap: Record<string, number> = {
   "baby-care": 800,
@@ -46,6 +51,8 @@ export default function BookingPage({ params }: Props) {
   const [address, setAddress] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [clientSecret, setClientSecret] = useState("");
+  const [showCheckout, setShowCheckout] = useState(false);
 
   const basePrice = serviceChargeMap[service_id] || 0;
   const totalCost = days * basePrice;
@@ -59,27 +66,56 @@ export default function BookingPage({ params }: Props) {
     setIsSubmitting(true);
     setError("");
 
-    // Requirement Match: Booking saved with status = Pending
-    const bookingData = {
-      service: service_id,
-      duration: days,
-      division,
-      address,
-      totalCost,
-      status: "Pending",
-      createdAt: new Date().toISOString(),
-    };
+    try {
+      const response = await fetch("/api/payments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount: totalCost, serviceName }),
+      });
 
-    console.log("Booking Created:", bookingData);
+      const data = await response.json();
+      if (data.clientSecret) {
+        setClientSecret(data.clientSecret);
+        setShowCheckout(true);
+      } else {
+        throw new Error(data.error || "Failed to initialize payment");
+      }
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
-    // Simulate API call delay for premium feel
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    setIsSubmitting(false);
-    
-    // In a real app, we'd redirect to a success page or dashboard
-    alert(`Booking successful! \nService: ${serviceName} \nStatus: Pending`);
-    router.push("/"); // Temporary redirect to home as /my-bookings might not exist yet
+  const createBookingRecord = async () => {
+    try {
+      // In a real app, userEmail comes from Auth session
+      const userEmail = "customer@example.com"; 
+
+      const bookingData = {
+        service: service_id,
+        duration: days,
+        division,
+        address,
+        totalCost,
+        status: "Confirmed",
+        userEmail,
+      };
+
+      const response = await fetch("/api/bookings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(bookingData),
+      });
+
+      if (response.ok) {
+        router.push("/my-bookings");
+      } else {
+        throw new Error("Failed to save booking record.");
+      }
+    } catch (err: any) {
+      setError(err.message);
+    }
   };
 
   const serviceName = service_id.split("-").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
@@ -244,20 +280,56 @@ export default function BookingPage({ params }: Props) {
                     </div>
                   </div>
 
-                  <button 
-                    onClick={handleBooking}
-                    disabled={isSubmitting}
-                    className="btn btn-primary btn-block h-16 rounded-2xl text-lg font-black shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all disabled:opacity-50 group"
-                  >
-                    {isSubmitting ? (
-                      <span className="loading loading-spinner"></span>
+                  <AnimatePresence mode="wait">
+                    {!showCheckout ? (
+                      <motion.button 
+                        key="book-btn"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        onClick={handleBooking}
+                        disabled={isSubmitting}
+                        className="btn btn-primary btn-block h-16 rounded-2xl text-lg font-black shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all disabled:opacity-50 group"
+                      >
+                        {isSubmitting ? (
+                          <span className="loading loading-spinner"></span>
+                        ) : (
+                          <>
+                            Proceed to Payment
+                            <ArrowLeft className="rotate-180 group-hover:translate-x-1 transition-transform" size={20} />
+                          </>
+                        )}
+                      </motion.button>
                     ) : (
-                      <>
-                        Confirm Booking
-                        <ArrowLeft className="rotate-180 group-hover:translate-x-1 transition-transform" size={20} />
-                      </>
+                      <motion.div
+                        key="stripe-form"
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                      >
+                        {clientSecret && (
+                          <Elements 
+                            stripe={stripePromise} 
+                            options={{ 
+                              clientSecret,
+                              appearance: {
+                                theme: 'stripe',
+                                variables: {
+                                  colorPrimary: '#0a84ff',
+                                },
+                              }
+                            }}
+                          >
+                            <CheckoutForm 
+                              amount={totalCost} 
+                              onSuccess={createBookingRecord} 
+                              onCancel={() => setShowCheckout(false)}
+                            />
+                          </Elements>
+                        )}
+                      </motion.div>
                     )}
-                  </button>
+                  </AnimatePresence>
 
                   <div className="mt-6 flex items-center justify-center gap-2 text-[11px] font-bold text-base-content/30 uppercase tracking-widest text-center">
                     <CheckCircle2 size={12} />
