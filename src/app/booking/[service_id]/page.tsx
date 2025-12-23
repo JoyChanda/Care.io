@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
+import { useSession } from "next-auth/react";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import CheckoutForm from "@/components/CheckoutForm";
@@ -33,20 +34,18 @@ type Props = {
 export default function BookingPage({ params }: Props) {
   const router = useRouter();
   const { service_id } = use(params);
+  const { data: session, status } = useSession();
 
   // Requirement Match: Auth Guard
   useEffect(() => {
-    // Check for "isLoggedIn" or "token" in localStorage/cookies
-    // For this simulation, we'll check a simulated flag
-    const checkAuth = () => {
-      const user = localStorage.getItem("user"); 
-      if (!user) {
-        // Not logged in -> Redirect to login
-        router.push("/auth/login");
-      }
-    };
-    checkAuth();
-  }, [router]);
+    if (status === "unauthenticated") {
+      router.push("/auth/login");
+    }
+  }, [status, router]);
+
+  if (status === "loading") {
+    return <div className="min-h-screen flex items-center justify-center"><span className="loading loading-spinner loading-lg text-primary"></span></div>;
+  }
 
   const [days, setDays] = useState(1);
   const [division, setDivision] = useState("");

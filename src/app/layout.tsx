@@ -10,6 +10,8 @@ export const metadata = {
   description: "Safe, reliable, and professional baby care, elderly care, and home care services.",
 };
 
+import AuthProvider from "./providers/AuthProvider";
+
 export default function RootLayout({
   children,
 }: {
@@ -18,11 +20,13 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning className={inter.className}>
       <body className="antialiased bg-base-100 text-base-content min-h-screen flex flex-col">
-        <ThemeProviders>
-          <LayoutWrapper>
-            {children}
-          </LayoutWrapper>
-        </ThemeProviders>
+        <AuthProvider>
+          <ThemeProviders>
+            <LayoutWrapper>
+              {children}
+            </LayoutWrapper>
+          </ThemeProviders>
+        </AuthProvider>
       </body>
     </html>
   );
