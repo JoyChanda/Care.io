@@ -20,10 +20,10 @@ import CheckoutForm from "@/components/CheckoutForm";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
-const serviceChargeMap: Record<string, number> = {
-  "baby-care": 800,
-  "elderly-care": 1000,
-  "sick-care": 1200,
+const serviceChargeMap: Record<string, { price: number; type: string }> = {
+  "baby-care": { price: 500, type: "hour" },
+  "elderly-care": { price: 1500, type: "day" },
+  "sick-care": { price: 1200, type: "day" },
 };
 
 type Props = {
@@ -34,12 +34,14 @@ export default function BookingPage({ params }: Props) {
   const router = useRouter();
   const { service_id } = use(params);
 
-  // ⚠️ Fake auth (replace with actual auth logic later)
+  // Requirement Match: Auth Guard
   useEffect(() => {
-    const checkAuth = async () => {
-      // Simple check for demonstration (In reality, we'd check a token in cookies or context)
-      const isLoggedIn = true; 
-      if (!isLoggedIn) {
+    // Check for "isLoggedIn" or "token" in localStorage/cookies
+    // For this simulation, we'll check a simulated flag
+    const checkAuth = () => {
+      const user = localStorage.getItem("user"); 
+      if (!user) {
+        // Not logged in -> Redirect to login
         router.push("/auth/login");
       }
     };
@@ -54,7 +56,8 @@ export default function BookingPage({ params }: Props) {
   const [clientSecret, setClientSecret] = useState("");
   const [showCheckout, setShowCheckout] = useState(false);
 
-  const basePrice = serviceChargeMap[service_id] || 0;
+  const serviceData = serviceChargeMap[service_id] || { price: 0, type: "day" };
+  const basePrice = serviceData.price;
   const totalCost = days * basePrice;
 
   const handleBooking = async () => {
@@ -163,18 +166,20 @@ export default function BookingPage({ params }: Props) {
                 <div className="space-y-4">
                   <label className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-base-content/60">
                     <Calendar size={18} className="text-primary" />
-                    How many days?
+                    How many {serviceData.type}s?
                   </label>
                   <div className="flex items-center gap-4">
                     <input
                       type="number"
                       min={1}
-                      max={30}
+                      max={720} // Allow more for hourly
                       value={days}
                       onChange={(e) => setDays(Math.max(1, parseInt(e.target.value) || 1))}
                       className="input input-lg input-bordered w-full rounded-2xl font-bold focus:ring-4 focus:ring-primary/10 transition-all"
                     />
-                    <span className="text-lg font-bold text-base-content/40 whitespace-nowrap">Days</span>
+                    <span className="text-lg font-bold text-base-content/40 capitalize whitespace-nowrap">
+                      {serviceData.type}s
+                    </span>
                   </div>
                 </div>
 
@@ -261,11 +266,11 @@ export default function BookingPage({ params }: Props) {
                   </div>
                   <div className="flex justify-between items-center text-sm">
                     <span className="text-base-content/50 font-medium tracking-tight">Base Charge</span>
-                    <span className="font-bold text-base-content tracking-tight">৳{basePrice} / day</span>
+                    <span className="font-bold text-base-content tracking-tight">৳{basePrice} / {serviceData.type}</span>
                   </div>
                   <div className="flex justify-between items-center text-sm">
                     <span className="text-base-content/50 font-medium tracking-tight">Booking Period</span>
-                    <span className="font-bold text-base-content tracking-tight">{days} {days > 1 ? 'Days' : 'Day'}</span>
+                    <span className="font-bold text-base-content tracking-tight">{days} {days > 1 ? `${serviceData.type}s` : serviceData.type}</span>
                   </div>
                 </div>
 

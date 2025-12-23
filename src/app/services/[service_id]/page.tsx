@@ -19,45 +19,55 @@ export async function generateMetadata({ params }: Props) {
 
 const serviceMap: Record<string, any> = {
   "baby-care": {
-    name: "Baby Care",
-    price: 800,
-    description: "Professional babysitting service ensuring safety and care for your little ones. Our caregivers are trained in infant safety and early childhood development.",
+    name: "Baby Care Service",
+    price: 500,
+    durationType: "hour",
+    description: "Professional and trusted babysitting services to ensure your child’s safety, comfort, and happiness at home.",
     icon: <Baby className="w-12 h-12" />,
     color: "from-blue-500/10 to-blue-600/5",
     accent: "text-blue-600",
-    features: ["Certified Baby Specialists", "Safety First Approach", "Activity Logging", "Emergency Response Ready"]
+    features: [
+      "Verified & trained caregivers",
+      "Flexible hourly booking",
+      "Safe and child-friendly care",
+      "Emergency support available",
+    ]
   },
   "elderly-care": {
-    name: "Elderly Care",
-    price: 1000,
-    description: "Compassionate elderly care with trained caregivers who provide assistance with daily activities, medication management, and emotional support.",
+    name: "Elderly Care Service",
+    price: 1500,
+    durationType: "day",
+    description: "Compassionate elderly care services providing daily assistance, companionship, and medical support.",
     icon: <Accessibility className="w-12 h-12" />,
     color: "from-emerald-500/10 to-emerald-600/5",
     accent: "text-emerald-600",
-    features: ["Medication Management", "Mobility Assistance", "Companionship", "Health Monitoring"]
+    features: [
+      "Daily health monitoring",
+      "Personal assistance",
+      "Medication reminders",
+      "Trained caregivers",
+    ]
   },
   "sick-care": {
-    name: "Sick Care",
+    name: "Sick Care Service",
     price: 1200,
-    description: "Special care service for sick patients at home. Our caregivers follow doctor instructions and provide professional support during recovery.",
+    durationType: "day",
+    description: "Home-based care services for patients needing special attention and recovery assistance.",
     icon: <Stethoscope className="w-12 h-12" />,
     color: "from-rose-500/10 to-rose-600/5",
     accent: "text-rose-600",
-    features: ["Recovery Support", "Vitals Checking", "Basic Nursing Care", "Appointment Assistance"]
+    features: [
+      "Post-hospital care",
+      "Basic medical support",
+      "Hygiene & comfort assistance",
+      "On-demand booking",
+    ]
   },
 };
 
 export default async function ServiceDetail({ params }: Props) {
   const { service_id } = await params;
   
-  // Requirement Match: Login check (Redirect to login if token is missing)
-  const cookieStore = await cookies();
-  const token = cookieStore.get("token");
-
-  if (!token) {
-    redirect("/auth/login");
-  }
-
   const service = serviceMap[service_id];
 
   if (!service) {
@@ -131,7 +141,7 @@ export default async function ServiceDetail({ params }: Props) {
                 <span className="text-xs font-bold uppercase tracking-widest text-base-content/40">Service Charge</span>
                 <div className="flex items-baseline gap-2">
                   <span className="text-4xl font-black text-primary">৳{service.price}</span>
-                  <span className="text-base-content/50 font-medium">/ day</span>
+                  <span className="text-base-content/50 font-medium">/ {service.durationType}</span>
                 </div>
               </div>
 
