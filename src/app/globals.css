@@ -2,40 +2,101 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+  }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  body {
+    @apply antialiased min-h-screen overflow-x-hidden;
+    background-color: hsl(var(--b1));
+    color: hsl(var(--bc));
+  }
+
+  ::selection {
+    background-color: hsl(var(--p) / 0.2);
+    color: hsl(var(--p));
   }
 }
 
-/* Smooth scrolling */
-html {
-  scroll-behavior: smooth;
+@layer components {
+
+  /* 
+     STRICT BUTTON DESIGN SYSTEM
+     Enforces uniform radius, glossy hover, and consistent focus across the app.
+  */
+  .btn,
+  button:not(.toggle-thumb):not(.toggle-pill):not(.btn-icon),
+  [role="button"]:not(.toggle-pill):not(.btn-icon) {
+    /* MANDATORY UNIFORM RADIUS */
+    @apply rounded-xl !important;
+
+    @apply transition-all duration-300 ease-in-out active:scale-95 cursor-pointer font-semibold;
+
+    /* GLOSSY HOVER EFFECT */
+    @apply hover:brightness-110 hover:shadow-xl hover:-translate-y-0.5;
+    background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0) 100%);
+
+    /* SHARED FOCUS BEHAVIOR (Accessible & Keyboard-Friendly) */
+    outline: none;
+  }
+
+  /* Padding for standard buttons with text */
+  .btn:not(.btn-square):not(.btn-circle),
+  button:not(.btn-square):not(.btn-circle):not(.toggle-pill):not(.btn-icon) {
+    @apply px-6;
+  }
+
+  /* Consistent focus ring for standard buttons */
+  .btn:focus-visible,
+  button:not(.toggle-thumb):not(.toggle-pill):focus-visible,
+  [role="button"]:not(.toggle-pill):focus-visible {
+    box-shadow: 0 0 0 2px hsl(var(--b1)), 0 0 0 4px hsl(var(--p));
+  }
+
+  /* 
+     MODERN SWITCH TOGGLE SYSTEM
+     Compliant with "clean and minimal" pill-style sliding switch with icons.
+  */
+  .toggle-pill {
+    @apply relative rounded-full transition-all duration-300 ease-in-out cursor-pointer overflow-hidden border;
+    outline: none;
+  }
+
+  .toggle-pill:focus-visible {
+    box-shadow: 0 0 0 2px hsl(var(--b1)), 0 0 0 4px hsl(var(--p));
+  }
+
+  .toggle-pill:hover {
+    @apply brightness-110 -translate-y-0.5 shadow-md;
+  }
+
+  .toggle-thumb {
+    @apply absolute rounded-full bg-white shadow-sm transition-transform duration-300 ease-out;
+  }
+
+  /* Specialized containers */
+  .card {
+    @apply rounded-3xl transition-all duration-300;
+    border: 1px solid hsl(var(--b2) / 0.5);
+  }
+
+  /* ICON BUTTON RESET - Prevents crushing in global layout */
+  .btn-icon {
+    @apply aspect-square p-0 flex items-center justify-center !important;
+    min-width: unset !important;
+    min-height: unset !important;
+  }
 }
 
-/* Prevent horizontal overflow */
-html,
-body {
-  overflow-x: hidden;
-  max-width: 100vw;
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-/* Custom backdrop blur utility */
 @layer utilities {
   .backdrop-blur-lg {
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
+  }
+
+  .text-balance {
+    text-wrap: balance;
   }
 }
