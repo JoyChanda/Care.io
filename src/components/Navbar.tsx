@@ -46,7 +46,7 @@ export default function Navbar() {
             {/* Brand + Mobile trigger */}
             <div className="flex items-center gap-4">
               <button
-                className="btn btn-ghost btn-icon rounded-xl lg:hidden flex items-center justify-center p-0 w-10 h-10"
+                className="btn btn-ghost btn-icon rounded-xl lg:!hidden flex items-center justify-center p-0 w-10 h-10"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 aria-label="Toggle Navigation"
               >

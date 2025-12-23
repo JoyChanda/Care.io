@@ -14,8 +14,8 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-8 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
           {/* Brand Section */}
-          <div className="flex flex-col gap-6">
-            <Link href="/" className="flex items-center gap-3 w-fit group">
+          <div className="flex flex-col items-center md:items-start text-center md:text-left gap-6">
+            <Link href="/" className="flex items-center gap-3 w-fit group md:mx-0 mx-auto">
               <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary shadow-inner group-hover:bg-primary group-hover:text-primary-content transition-colors">
                 <Heart size={20} fill="currentColor" />
               </span>
@@ -29,13 +29,13 @@ export default function Footer() {
               </div>
             </Link>
 
-            <p className="text-sm text-base-content/60 leading-relaxed max-w-[260px]">
+            <p className="text-sm text-base-content/60 leading-relaxed max-w-[260px] mx-auto md:mx-0">
               Providing compassionate and professional caregiving services for
               families who value safety, reliability, and peace of mind.
             </p>
 
             {/* Social Links - MODERN X LOGO via Lucide */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center justify-center md:justify-start gap-3">
               {[
                 { label: 'Facebook', Icon: Facebook },
                 { label: 'X', Icon: Twitter },
@@ -53,9 +53,9 @@ export default function Footer() {
           </div>
 
           {/* Quick Links */}
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col items-center md:items-start text-center md:text-left gap-6">
             <h4 className="font-bold text-base tracking-tight">Company</h4>
-            <nav className="flex flex-col gap-3">
+            <nav className="flex flex-col items-center md:items-start gap-3">
               {["About Us", "Our Team", "Careers", "Contact"].map((link) => (
                 <Link
                   key={link}
@@ -69,9 +69,9 @@ export default function Footer() {
           </div>
 
           {/* Services */}
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col items-center md:items-start text-center md:text-left gap-6">
             <h4 className="font-bold text-base tracking-tight">Services</h4>
-            <nav className="flex flex-col gap-3">
+            <nav className="flex flex-col items-center md:items-start gap-3">
               {["Baby Care", "Elderly Care", "Sick Care", "House Keeping"].map(
                 (link) => (
                   <Link
@@ -87,10 +87,10 @@ export default function Footer() {
           </div>
 
           {/* Contact Information */}
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col items-center md:items-start text-center md:text-left gap-6">
             <h4 className="font-bold text-base tracking-tight">Contact</h4>
-            <div className="flex flex-col gap-4">
-              <div className="flex gap-3">
+            <div className="flex flex-col items-center md:items-start gap-4">
+              <div className="flex flex-col items-center md:flex-row md:items-start gap-3">
                 <span className="text-primary mt-0.5 px-1 font-bold">
                   <MapPin size={18} />
                 </span>
@@ -100,7 +100,7 @@ export default function Footer() {
                   Careland, CA 90210
                 </p>
               </div>
-              <div className="flex gap-3">
+              <div className="flex flex-col items-center md:flex-row md:items-start gap-3">
                 <span className="text-primary mt-0.5 px-1 font-bold">
                   <Phone size={18} />
                 </span>
@@ -108,7 +108,7 @@ export default function Footer() {
                   +1 (555) 000-0000
                 </p>
               </div>
-              <div className="flex gap-3">
+              <div className="flex flex-col items-center md:flex-row md:items-start gap-3">
                 <span className="text-primary mt-0.5 px-1 font-bold">
                   <Mail size={18} />
                 </span>
