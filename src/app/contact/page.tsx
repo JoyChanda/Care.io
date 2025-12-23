@@ -178,7 +178,9 @@ export default function ContactPage() {
                Our network of verified caregivers spans across all major divisions. From Dhaka to Sylhet, we bring professional care right to your doorstep.
             </p>
             <div className="pt-4 relative z-10">
-               <button className="btn btn-lg bg-white text-primary border-none hover:bg-white/90 rounded-2xl px-12 font-black gap-2 shadow-xl">
+               <button 
+                 className="inline-flex items-center gap-2 btn btn-lg bg-white border-none hover:bg-white/90 rounded-2xl px-12 font-black shadow-xl text-blue-600"
+               >
                   Check Coverage
                   <ChevronRight size={20} />
                </button>

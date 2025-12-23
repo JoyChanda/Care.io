@@ -182,9 +182,14 @@ export default function MyBookings() {
                           >
                             Cancel
                           </button>
+                        ) : b.status === "Cancelled" ? (
+                          <span className="text-xs text-base-content/30 font-bold">No actions</span>
                         ) : (
-                          <Link href={`/booking/${b.service.toLowerCase().replace(' ', '-')}`} className="btn btn-sm btn-ghost btn-circle">
-                            <ChevronRight size={18} />
+                          <Link 
+                            href={`/services/${b.service.toLowerCase().replace(' ', '-')}`} 
+                            className="btn btn-sm btn-primary btn-outline rounded-xl font-bold px-4"
+                          >
+                            View Details
                           </Link>
                         )}
                       </td>
@@ -211,17 +216,17 @@ export default function MyBookings() {
         {/* Support Section */}
         <div className="mt-12 p-8 rounded-[2rem] bg-gradient-to-br from-primary/5 to-secondary/5 border border-primary/10 flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-4">
-            <div className="h-12 w-12 rounded-2xl bg-white shadow-sm flex items-center justify-center text-primary">
+            <div className="h-12 w-12 rounded-2xl bg-white shadow-sm flex items-center justify-center text-gray-800 dark:text-gray-100">
               <ShieldCheck size={24} />
             </div>
             <div>
-              <h4 className="font-bold text-lg leading-tight">Need assistance?</h4>
+              <h4 className="font-bold text-lg leading-tight">🤝 Need assistance?</h4>
               <p className="text-sm text-base-content/50">Our 24/7 care support team is always here to help.</p>
             </div>
           </div>
-          <button className="btn btn-outline btn-primary rounded-xl px-8 font-bold">
+          <Link href="/contact" className="btn btn-outline btn-primary rounded-xl px-8 font-bold">
             Contact Support
-          </button>
+          </Link>
         </div>
       </div>
     </main>

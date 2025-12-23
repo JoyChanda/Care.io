@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import ServiceCard from "../components/ServiceCard";
 import { Users } from "lucide-react";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -36,12 +37,16 @@ export default function Home() {
         </p>
 
         <div className="mt-12 flex justify-center gap-4 flex-wrap">
-          <button className="btn btn-primary px-10 h-14 text-base font-bold">
-            Get Started Now
-          </button>
-          <button className="btn btn-outline btn-primary px-10 h-14 text-base font-bold bg-transparent">
-            Explore Services
-          </button>
+          <Link href="/auth/login">
+            <button className="btn btn-primary px-10 h-14 text-base font-bold">
+              Get Started Now
+            </button>
+          </Link>
+          <Link href="/services">
+            <button className="btn btn-outline btn-primary px-10 h-14 text-base font-bold bg-transparent">
+              Explore Services
+            </button>
+          </Link>
         </div>
       </motion.section>
 

@@ -178,7 +178,7 @@ export default function AboutPage() {
           <div className="pt-4 relative z-10">
             <a 
               href="/services" 
-              className="btn btn-lg bg-white text-primary border-none hover:bg-white/90 rounded-2xl px-10 font-black gap-3 shadow-xl"
+              className="inline-flex items-center gap-3 btn btn-lg bg-white border-none hover:bg-white/90 rounded-2xl px-10 font-black shadow-xl text-blue-600"
             >
               Browse Services
               <ChevronRight size={20} />

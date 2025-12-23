@@ -50,6 +50,9 @@ export default function BookingPage({ params }: Props) {
 
   const [days, setDays] = useState(1);
   const [division, setDivision] = useState("");
+  const [district, setDistrict] = useState("");
+  const [city, setCity] = useState("");
+  const [area, setArea] = useState("");
   const [address, setAddress] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -205,6 +208,59 @@ export default function BookingPage({ params }: Props) {
                       <option value="Rangpur">Rangpur</option>
                       <option value="Mymensingh">Mymensingh</option>
                     </select>
+                  </div>
+
+                  <div className="space-y-4">
+                    <label className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-base-content/60">
+                      <MapPin size={18} className="text-primary" />
+                      District
+                    </label>
+                    <select
+                      value={district}
+                      onChange={(e) => setDistrict(e.target.value)}
+                      className="select select-lg select-bordered w-full rounded-2xl font-semibold focus:ring-4 focus:ring-primary/10 transition-all"
+                      disabled={!division}
+                    >
+                      <option value="" disabled>Choose your district</option>
+                      <option value="Dhaka">Dhaka</option>
+                      <option value="Gazipur">Gazipur</option>
+                      <option value="Narayanganj">Narayanganj</option>
+                      <option value="Chattogram">Chattogram</option>
+                      <option value="Cox's Bazar">Cox's Bazar</option>
+                      <option value="Rajshahi">Rajshahi</option>
+                      <option value="Khulna">Khulna</option>
+                      <option value="Sylhet">Sylhet</option>
+                    </select>
+                  </div>
+
+                  <div className="space-y-4">
+                    <label className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-base-content/60">
+                      <MapPin size={18} className="text-primary" />
+                      City/Upazila
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Enter city or upazila name"
+                      value={city}
+                      onChange={(e) => setCity(e.target.value)}
+                      className="input input-lg input-bordered w-full rounded-2xl font-semibold focus:ring-4 focus:ring-primary/10 transition-all"
+                      disabled={!district}
+                    />
+                  </div>
+
+                  <div className="space-y-4">
+                    <label className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-base-content/60">
+                      <MapPin size={18} className="text-primary" />
+                      Area/Locality
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Enter area or locality name"
+                      value={area}
+                      onChange={(e) => setArea(e.target.value)}
+                      className="input input-lg input-bordered w-full rounded-2xl font-semibold focus:ring-4 focus:ring-primary/10 transition-all"
+                      disabled={!city}
+                    />
                   </div>
 
                   <div className="space-y-4">

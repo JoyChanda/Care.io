@@ -17,6 +17,7 @@ export default function LayoutWrapper({
     "/my-bookings",
     "/about",
     "/contact",
+    "/our-team",
     "/auth/login",
     "/auth/register",
   ];
