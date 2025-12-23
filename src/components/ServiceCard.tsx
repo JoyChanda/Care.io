@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Baby, Accessibility, Stethoscope, Sparkles } from "lucide-react";
+import Link from "next/link";
 
 interface ServiceCardProps {
   title: string;
@@ -43,9 +44,11 @@ export default function ServiceCard({ title }: ServiceCardProps) {
           {descriptions[title] || "Professional care services tailored to fit your specific family needs with maximum compassion."}
         </p>
         
-        <button className="btn btn-outline btn-primary w-full tracking-wide font-bold">
-          Learn More
-        </button>
+        <Link href={`/services/${title.toLowerCase().replace(" ", "-")}`} className="w-full">
+          <button className="btn btn-outline btn-primary w-full tracking-wide font-bold">
+            Learn More
+          </button>
+        </Link>
       </div>
     </motion.div>
   );
