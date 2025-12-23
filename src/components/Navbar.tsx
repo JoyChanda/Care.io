@@ -86,13 +86,13 @@ export default function Navbar() {
               </div>
               <div className="flex items-center gap-2">
                 <Link
-                  href="/login"
+                  href="/auth/login"
                   className="hidden md:inline-flex btn btn-ghost btn-sm px-4 font-semibold"
                 >
                   Login
                 </Link>
                 <Link
-                  href="/register"
+                  href="/auth/register"
                   className="btn btn-primary btn-sm sm:btn-md px-6 font-bold"
                 >
                   Join Us
@@ -154,8 +154,8 @@ export default function Navbar() {
 
           <div className="p-6 border-t border-base-200 bg-base-100/50">
              <div className="grid grid-cols-2 gap-3">
-               <Link href="/login" onClick={closeMenu} className="btn btn-outline btn-block rounded-xl">Login</Link>
-               <Link href="/register" onClick={closeMenu} className="btn btn-primary btn-block rounded-xl">Join</Link>
+               <Link href="/auth/login" onClick={closeMenu} className="btn btn-outline btn-block rounded-xl">Login</Link>
+               <Link href="/auth/register" onClick={closeMenu} className="btn btn-primary btn-block rounded-xl">Join</Link>
              </div>
           </div>
         </aside>

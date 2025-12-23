@@ -35,7 +35,7 @@ export default function BookingPage({ params }: Props) {
       // Simple check for demonstration (In reality, we'd check a token in cookies or context)
       const isLoggedIn = true; 
       if (!isLoggedIn) {
-        router.push("/login");
+        router.push("/auth/login");
       }
     };
     checkAuth();

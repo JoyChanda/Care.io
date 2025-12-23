@@ -55,7 +55,7 @@ export default async function ServiceDetail({ params }: Props) {
   const token = cookieStore.get("token");
 
   if (!token) {
-    redirect("/login");
+    redirect("/auth/login");
   }
 
   const service = serviceMap[service_id];
