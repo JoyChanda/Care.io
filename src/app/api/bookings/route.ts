@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { dbConnect } from "@/lib/dbConnect";
 import Booking from "@/models/Booking";
+import { sendInvoice } from "@/utils/sendInvoice";
 
 export async function POST(req: Request) {
   try {
@@ -16,6 +17,15 @@ export async function POST(req: Request) {
     }
 
     const booking = await Booking.create(body);
+
+    // Send email invoice asynchronously
+    try {
+      await sendInvoice(body.userEmail, booking);
+    } catch (emailError) {
+      console.error("Email delivery failed:", emailError);
+      // We don't fail the request if email fails, but we log it
+    }
+
     return NextResponse.json(booking, { status: 201 });
   } catch (error: any) {
     return NextResponse.json(
