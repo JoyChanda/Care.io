@@ -37,6 +37,33 @@ export default function UserMenu() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Prevent background scroll on mobile when dropdown is open
+  useEffect(() => {
+    const isMobile = window.innerWidth < 1024; // lg breakpoint
+    
+    if (isOpen && isMobile) {
+      // Store original overflow value and scroll position
+      const originalOverflow = document.body.style.overflow;
+      const originalPosition = document.body.style.position;
+      const scrollY = window.scrollY;
+      
+      // Prevent scroll
+      document.body.style.overflow = "hidden";
+      document.body.style.position = "fixed";
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = "100%";
+      
+      return () => {
+        // Restore scroll
+        document.body.style.overflow = originalOverflow;
+        document.body.style.position = originalPosition;
+        document.body.style.top = "";
+        document.body.style.width = "";
+        window.scrollTo(0, scrollY);
+      };
+    }
+  }, [isOpen]);
+
   const handleLogout = () => {
     signOut({ callbackUrl: "/login" });
     toast.success("Logged out successfully! 👋");
@@ -145,6 +172,13 @@ export default function UserMenu() {
                 href="/my-bookings" 
                 icon={<Calendar size={20} className="text-secondary" />} 
                 label="Booking History" 
+                onClick={() => setIsOpen(false)}
+              />
+              <DropdownItem 
+                variants={itemVariants}
+                href="/admin" 
+                icon={<Shield size={20} className="text-accent" />} 
+                label="Admin Dashboard" 
                 onClick={() => setIsOpen(false)}
               />
             </div>

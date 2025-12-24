@@ -9,8 +9,10 @@ import {
   Lock, 
   ArrowRight,
   ShieldCheck,
+  AlertCircle,
   Check,
-  AlertCircle
+  Eye,
+  EyeOff
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { signIn } from "next-auth/react";
@@ -25,6 +27,7 @@ export default function LoginPage() {
   // Field states
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleGoogleLogin = () => {
     setIsLoading(true);
@@ -158,7 +161,7 @@ export default function LoginPage() {
                     <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-base-content/30" size={18} />
                     <input 
                       type="text"
-                      className="input input-lg input-bordered w-full rounded-2xl pl-12 text-sm font-semibold focus:ring-4 focus:ring-primary/10 transition-all" 
+                      className="input input-lg h-16 input-bordered w-full rounded-2xl pl-12 text-sm font-semibold focus:ring-4 focus:ring-primary/10 transition-all" 
                       placeholder="Email or Phone Number" 
                       required 
                       value={identifier}
@@ -177,13 +180,20 @@ export default function LoginPage() {
                     <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-base-content/30" size={18} />
                     <input
                       name="password"
-                      type="password"
-                      className="input input-lg input-bordered w-full rounded-2xl pl-12 text-sm font-semibold focus:ring-4 focus:ring-primary/10 transition-all"
+                      type={showPassword ? "text" : "password"}
+                      className="input input-lg h-16 input-bordered w-full rounded-2xl pl-12 pr-12 text-sm font-semibold focus:ring-4 focus:ring-primary/10 transition-all"
                       placeholder="••••••••"
                       required
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-base-content/30 hover:text-primary transition-colors"
+                    >
+                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
                   </div>
                 </div>
 

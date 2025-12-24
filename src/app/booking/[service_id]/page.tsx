@@ -65,8 +65,8 @@ export default function BookingPage({ params }: Props) {
   const totalCost = days * basePrice;
 
   const handleBooking = async () => {
-    if (!division || !address) {
-      setError("Please fill in all location details.");
+    if (!division || !district || !city || !area || !address) {
+      setError("Please fill in all location details (Division, District, City, Area, and Address).");
       toast.error("Please fill in all location details.");
       return;
     }
@@ -100,17 +100,17 @@ export default function BookingPage({ params }: Props) {
 
   const createBookingRecord = async () => {
     try {
-      // In a real app, userEmail comes from Auth session
-      const userEmail = "customer@example.com"; 
-
       const bookingData = {
         service: service_id,
         duration: days,
         division,
+        district,
+        city,
+        area,
         address,
         totalCost,
-        status: "Confirmed",
-        userEmail,
+        status: "Pending",
+        userEmail: session?.user?.email,
       };
 
       const response = await fetch("/api/bookings", {

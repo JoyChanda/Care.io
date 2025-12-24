@@ -58,3 +58,36 @@ export async function GET(req: Request) {
     );
   }
 }
+export async function PATCH(req: Request) {
+  try {
+    await dbConnect();
+    const { id, status } = await req.json();
+
+    if (!id || !status) {
+      return NextResponse.json(
+        { error: "Booking ID and new status are required" },
+        { status: 400 }
+      );
+    }
+
+    const updatedBooking = await Booking.findByIdAndUpdate(
+      id,
+      { status },
+      { new: true }
+    );
+
+    if (!updatedBooking) {
+      return NextResponse.json(
+        { error: "Booking not found" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(updatedBooking);
+  } catch (error: any) {
+    return NextResponse.json(
+      { error: error.message || "Failed to update booking" },
+      { status: 500 }
+    );
+  }
+}

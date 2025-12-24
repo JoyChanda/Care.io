@@ -21,7 +21,7 @@ import { useEffect } from "react";
 import toast from "react-hot-toast";
 
 interface Booking {
-  id: number;
+  id: string;
   service: string;
   duration: number;
   location: string;
@@ -41,43 +41,62 @@ export default function MyBookings() {
     }
   }, [status, router]);
 
-  const [bookings, setBookings] = useState<Booking[]>([
-    {
-      id: 1,
-      service: "Baby Care",
-      duration: 3,
-      location: "Dhaka, Bangladesh",
-      total: 2400,
-      status: "Pending",
-      date: "Oct 24, 2025"
-    },
-    {
-      id: 2,
-      service: "Elderly Care",
-      duration: 7,
-      location: "Chattogram, Bangladesh",
-      total: 8400,
-      status: "Confirmed",
-      date: "Oct 20, 2025"
-    },
-    {
-      id: 3,
-      service: "Sick Care",
-      duration: 2,
-      location: "Dhaka, Bangladesh",
-      total: 3000,
-      status: "Completed",
-      date: "Oct 15, 2025"
-    }
-  ]);
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [loadingBookings, setLoadingBookings] = useState(true);
 
-  const cancelBooking = (id: number) => {
-    setBookings(
-      bookings.map((b) =>
-        b.id === id ? { ...b, status: "Cancelled" } : b
-      )
-    );
-    toast.success("Booking cancelled successfully.");
+  useEffect(() => {
+    const fetchBookings = async () => {
+      if (!session?.user?.email) return;
+      
+      try {
+        const res = await fetch(`/api/bookings?email=${session.user.email}`);
+        if (res.ok) {
+          const data = await res.json();
+          // Transform if needed
+          setBookings(data.map((b: any) => ({
+            id: b._id,
+            service: b.service.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
+            duration: b.duration,
+            location: `${b.area}, ${b.city}, ${b.district}`,
+            total: b.totalCost,
+            status: b.status,
+            date: new Date(b.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+          })));
+        }
+      } catch (err) {
+        console.error("Failed to fetch bookings:", err);
+        toast.error("Failed to load bookings");
+      } finally {
+        setLoadingBookings(false);
+      }
+    };
+
+    if (status === "authenticated") {
+      fetchBookings();
+    }
+  }, [session, status]);
+
+  const cancelBooking = async (id: string) => {
+    try {
+      const res = await fetch("/api/bookings", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, status: "Cancelled" }),
+      });
+
+      if (res.ok) {
+        setBookings(
+          bookings.map((b) =>
+            b.id === id ? { ...b, status: "Cancelled" } : b
+          )
+        );
+        toast.success("Booking cancelled successfully.");
+      } else {
+        throw new Error("Failed to cancel booking");
+      }
+    } catch (err) {
+      toast.error("Failed to cancel booking. Please try again.");
+    }
   };
 
   const getStatusStyle = (status: Booking["status"]) => {

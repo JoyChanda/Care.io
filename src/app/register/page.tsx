@@ -13,7 +13,9 @@ import {
   ArrowRight,
   ShieldCheck,
   AlertCircle,
-  Check
+  Check,
+  Eye,
+  EyeOff
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
@@ -30,6 +32,9 @@ export default function RegisterPage() {
   const [email, setEmail] = useState("");
   const [contact, setContact] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,6 +47,13 @@ export default function RegisterPage() {
     if (password.length < 6) {
       setError("Password must be at least 6 characters long.");
       toast.error("Registration failed. Password too short.");
+      setIsLoading(false);
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
+      toast.error("Registration failed. Passwords do not match.");
       setIsLoading(false);
       return;
     }
@@ -62,8 +74,11 @@ export default function RegisterPage() {
       toast.success("Account created successfully. Please login.");
       setSuccess(true);
       
+      const urlParams = new URLSearchParams(window.location.search);
+      const callbackUrl = urlParams.get('callbackUrl') || "/login";
+      
       setTimeout(() => {
-        router.push("/login");
+        router.push(callbackUrl.includes('login') ? callbackUrl : `/login?callbackUrl=${callbackUrl}`);
       }, 1500);
     } catch (err: any) {
       setError(err.message || "Registration failed. Please try again.");
@@ -143,7 +158,7 @@ export default function RegisterPage() {
                     <div className="relative">
                       <User className="absolute left-4 top-1/2 -translate-y-1/2 text-base-content/30" size={18} />
                       <input 
-                        className="input input-lg input-bordered w-full rounded-2xl pl-12 text-sm font-semibold focus:ring-4 focus:ring-primary/10 transition-all" 
+                        className="input input-lg h-16 input-bordered w-full rounded-2xl pl-12 text-sm font-semibold focus:ring-4 focus:ring-primary/10 transition-all" 
                         placeholder="John Doe" 
                         required 
                         value={name}
@@ -184,25 +199,59 @@ export default function RegisterPage() {
                   </div>
                 </div>
 
-                {/* Password */}
-                <div className="space-y-2">
-                  <label className="text-xs font-black uppercase tracking-widest text-base-content/40 px-1">Password</label>
-                  <div className="relative">
-                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-base-content/30" size={18} />
-                    <input
-                      name="password"
-                      type="password"
-                      className="input input-lg input-bordered w-full rounded-2xl pl-12 text-sm font-semibold focus:ring-4 focus:ring-primary/10 transition-all"
-                      placeholder="••••••••"
-                      required
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                    />
+                {/* Password Fields Row */}
+                <div className="grid sm:grid-cols-2 gap-5">
+                  {/* Password */}
+                  <div className="space-y-2">
+                    <label className="text-xs font-black uppercase tracking-widest text-base-content/40 px-1">Password</label>
+                    <div className="relative">
+                      <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-base-content/30" size={18} />
+                      <input
+                        name="password"
+                        type={showPassword ? "text" : "password"}
+                        className="input input-lg h-16 input-bordered w-full rounded-2xl pl-12 pr-12 text-sm font-semibold focus:ring-4 focus:ring-primary/10 transition-all"
+                        placeholder="••••••••"
+                        required
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-base-content/30 hover:text-primary transition-colors"
+                      >
+                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                      </button>
+                    </div>
                   </div>
-                  <p className="text-[10px] text-base-content/40 font-medium px-1 italic">
-                    Must be 6+ characters with at least one letter and one number.
-                  </p>
+
+                  {/* Confirm Password */}
+                  <div className="space-y-2">
+                    <label className="text-xs font-black uppercase tracking-widest text-base-content/40 px-1">Confirm Password</label>
+                    <div className="relative">
+                      <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-base-content/30" size={18} />
+                      <input
+                        name="confirmPassword"
+                        type={showConfirmPassword ? "text" : "password"}
+                        className="input input-lg h-16 input-bordered w-full rounded-2xl pl-12 pr-12 text-sm font-semibold focus:ring-4 focus:ring-primary/10 transition-all"
+                        placeholder="••••••••"
+                        required
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-base-content/30 hover:text-primary transition-colors"
+                      >
+                        {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                      </button>
+                    </div>
+                  </div>
                 </div>
+                <p className="text-[10px] text-base-content/40 font-medium px-1 italic -mt-4">
+                  Must be 6+ characters with at least one letter and one number.
+                </p>
 
                 {error && (
                   <motion.div 
