@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { 
@@ -28,6 +28,22 @@ export default function LoginPage() {
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+
+  // Catch URL errors during mount
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const urlError = params.get("error");
+    if (urlError) {
+      if (urlError === "OAuthCallback") {
+        setError("Login failed: Redirect URI mismatch or Google settings incorrect.");
+      } else if (urlError === "OAuthSignin") {
+        setError("Login failed: Could not start Google Sign-in. Check your Client ID.");
+      } else {
+        setError(`Auth Error: ${urlError}`);
+      }
+      toast.error(`Sign-in problem: ${urlError}`);
+    }
+  }, []);
 
   const handleGoogleLogin = () => {
     setIsLoading(true);
