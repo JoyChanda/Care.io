@@ -111,8 +111,8 @@ export default function LoginPage() {
                 <div className="w-20 h-20 bg-success/10 text-success rounded-full flex items-center justify-center mx-auto mb-6">
                   <Check size={40} />
                 </div>
-                <h2 className="text-2xl font-bold">Authenticated</h2>
-                <p className="text-base-content/60">Redirecting you to your previous page...</p>
+                <h2 className="text-2xl font-bold">Welcome Back!</h2>
+                <p className="text-base-content/60">You've successfully authenticated. Redirecting you home...</p>
               </motion.div>
             ) : (
               <div className="space-y-6">
@@ -120,7 +120,7 @@ export default function LoginPage() {
                 <div className="flex justify-center w-full">
                   <button
                     onClick={handleGoogleLogin}
-                    className="btn h-14 bg-white hover:bg-gray-50 text-gray-900 border border-gray-200 rounded-2xl gap-3 shadow-sm hover:shadow-md transition-all normal-case font-bold text-base flex justify-center items-center px-10"
+                    className="btn h-16 w-full bg-white hover:bg-gray-50 text-gray-900 border border-gray-200 rounded-2xl gap-3 shadow-md hover:shadow-lg transition-all normal-case font-black text-base flex justify-center items-center px-10"
                   >
                     <svg className="h-5 w-5" viewBox="0 0 24 24">
                       <path

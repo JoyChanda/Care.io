@@ -30,13 +30,14 @@ const handler = NextAuth({
           let user;
 
           // Check if identifier looks like an email
-          const isEmail = identifier.includes("@");
+    const normalizedIdentifier = identifier.toLowerCase();
+    const isEmail = normalizedIdentifier.includes("@");
 
-          if (isEmail) {
-            user = await User.findOne({ email: identifier });
-          } else {
-            user = await User.findOne({ contact: identifier });
-          }
+    if (isEmail) {
+      user = await User.findOne({ email: normalizedIdentifier });
+    } else {
+      user = await User.findOne({ contact: identifier });
+    }
 
           if (!user || !user.password) {
             console.log("Auth failed: User not found or no password");

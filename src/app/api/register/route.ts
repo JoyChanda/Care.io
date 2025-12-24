@@ -16,14 +16,16 @@ export async function POST(req: Request) {
 
     await dbConnect();
 
+    const normalizedEmail = email.toLowerCase();
+
     // Check if user already exists
     const existingUser = await User.findOne({
-      $or: [{ email }, { contact }, { nid }],
+      $or: [{ email: normalizedEmail }, { contact }, { nid }],
     });
 
     if (existingUser) {
       let message = "User already exists";
-      if (existingUser.email === email) message = "Email already registered";
+      if (existingUser.email === normalizedEmail) message = "Email already registered";
       else if (existingUser.contact === contact) message = "Contact number already registered";
       else if (existingUser.nid === nid) message = "NID already registered";
       
@@ -40,7 +42,7 @@ export async function POST(req: Request) {
     const newUser = await User.create({
       nid,
       name,
-      email,
+      email: normalizedEmail,
       contact,
       password: hashedPassword,
     });
