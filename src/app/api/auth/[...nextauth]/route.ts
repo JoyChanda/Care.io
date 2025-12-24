@@ -23,37 +23,43 @@ const handler = NextAuth({
           throw new Error("Invalid credentials");
         }
 
-        await dbConnect();
+        try {
+          await dbConnect();
 
-        const { identifier, password } = credentials;
-        let user;
+          const { identifier, password } = credentials;
+          let user;
 
-        // Check if identifier looks like an email
-        const isEmail = identifier.includes("@");
+          // Check if identifier looks like an email
+          const isEmail = identifier.includes("@");
 
-        if (isEmail) {
-          user = await User.findOne({ email: identifier });
-        } else {
-          // Assume it's a phone number (checking 'contact' field)
-          user = await User.findOne({ contact: identifier });
+          if (isEmail) {
+            user = await User.findOne({ email: identifier });
+          } else {
+            user = await User.findOne({ contact: identifier });
+          }
+
+          if (!user || !user.password) {
+            console.log("Auth failed: User not found or no password");
+            throw new Error("Invalid credentials");
+          }
+
+          const isMatch = await bcrypt.compare(password, user.password);
+
+          if (!isMatch) {
+            console.log("Auth failed: Password mismatch");
+            throw new Error("Invalid credentials");
+          }
+
+          return {
+            id: (user as any)._id.toString(),
+            name: user.name,
+            email: user.email,
+            image: user.image,
+          };
+        } catch (error) {
+          console.error("Critical Auth Error:", error);
+          throw error;
         }
-
-        if (!user || !user.password) {
-          throw new Error("Invalid credentials");
-        }
-
-        const isMatch = await bcrypt.compare(password, user.password);
-
-        if (!isMatch) {
-          throw new Error("Invalid credentials");
-        }
-
-        return {
-          id: (user as any)._id.toString(),
-          name: user.name,
-          email: user.email,
-          image: user.image,
-        };
       },
     }),
   ],

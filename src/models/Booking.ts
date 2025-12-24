@@ -1,6 +1,18 @@
-import mongoose from "mongoose";
+import mongoose, { Schema, Document, Model } from "mongoose";
 
-const BookingSchema = new mongoose.Schema(
+export interface IBooking extends Document {
+  service: string;
+  duration: number;
+  division: string;
+  address: string;
+  totalCost: number;
+  status: "Pending" | "Confirmed" | "Completed" | "Cancelled";
+  userEmail: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const BookingSchema: Schema = new Schema(
   {
     service: { type: String, required: true },
     duration: { type: Number, required: true },
@@ -17,6 +29,6 @@ const BookingSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Booking = mongoose.models.Booking || mongoose.model("Booking", BookingSchema);
+const Booking: Model<IBooking> = mongoose.models.Booking || mongoose.model<IBooking>("Booking", BookingSchema);
 
 export default Booking;

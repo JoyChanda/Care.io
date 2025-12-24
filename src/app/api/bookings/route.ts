@@ -48,7 +48,7 @@ export async function GET(req: Request) {
     const userEmail = searchParams.get("email");
     
     const query = userEmail ? { userEmail } : {};
-    const bookings = await Booking.find(query as any).sort({ createdAt: -1 });
+    const bookings = await Booking.find(query).sort({ createdAt: -1 });
     
     return NextResponse.json(bookings);
   } catch (error: any) {

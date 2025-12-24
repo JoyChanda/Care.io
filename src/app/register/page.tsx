@@ -200,7 +200,7 @@ export default function RegisterPage() {
                     />
                   </div>
                   <p className="text-[10px] text-base-content/40 font-medium px-1 italic">
-                    Must be 6+ chars with at least one uppercase and one lowercase letter.
+                    Must be 6+ characters with at least one letter and one number.
                   </p>
                 </div>
 
@@ -233,7 +233,7 @@ export default function RegisterPage() {
                 <div className="pt-6 text-center">
                   <p className="text-sm font-medium text-base-content/60">
                     Already have an account?{" "}
-                    <Link href="/auth/login" className="text-primary font-black hover:underline underline-offset-4">
+                    <Link href="/login" className="text-primary font-black hover:underline underline-offset-4">
                       Log In
                     </Link>
                   </p>

@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const MONGODB_URI = process.env.MONGODB_URI!;
+const MONGODB_URI = process.env.MONGODB_URI;
 
 if (!MONGODB_URI) {
   throw new Error(
@@ -12,14 +12,25 @@ if (!MONGODB_URI) {
  * Global is used here to maintain a cached connection across hot reloads
  * in development. This prevents connections from growing exponentially
  * during API Route usage.
+ * 
+ * Type definition for mongoose cache
  */
-let cached = (global as any).mongoose;
-
-if (!cached) {
-  cached = (global as any).mongoose = { conn: null, promise: null };
+interface MongooseCache {
+  conn: typeof mongoose | null;
+  promise: Promise<typeof mongoose> | null;
 }
 
-export const dbConnect = async () => {
+declare global {
+  var mongoose: MongooseCache | undefined;
+}
+
+let cached: MongooseCache = global.mongoose || { conn: null, promise: null };
+
+if (!global.mongoose) {
+  global.mongoose = cached;
+}
+
+export async function dbConnect(): Promise<typeof mongoose> {
   if (cached.conn) {
     return cached.conn;
   }
@@ -36,8 +47,20 @@ export const dbConnect = async () => {
   
   try {
     cached.conn = await cached.promise;
-  } catch (e) {
+  } catch (e: any) {
     cached.promise = null;
+    
+    // Provide helpful error messages for common connection issues
+    if (e.message?.includes('ENOTFOUND') || e.message?.includes('querySrv')) {
+      const errorMsg = `MongoDB Connection Error: ${e.message}\n\n` +
+        `Possible issues:\n` +
+        `1. Check your MONGODB_URI in .env.local\n` +
+        `2. Make sure cluster name is "cluster0" (zero) not "clusterO" (letter O)\n` +
+        `3. Verify your MongoDB Atlas cluster is running\n` +
+        `4. Check your network connection and firewall settings`;
+      throw new Error(errorMsg);
+    }
+    
     throw e;
   }
 

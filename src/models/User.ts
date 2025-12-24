@@ -15,8 +15,8 @@ const UserSchema: Schema = new Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String },
-  contact: { type: String },
-  nid: { type: String },
+  contact: { type: String, unique: true, sparse: true },
+  nid: { type: String, unique: true, sparse: true },
   image: { type: String },
 }, { timestamps: true });
 
