@@ -1,10 +1,16 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Heart, MapPin, Phone, Mail, Facebook, Twitter, Instagram, Youtube } from "lucide-react";
 
 export default function Footer() {
-  const currentYear = new Date().getFullYear();
+  // Use state to avoid hydration mismatch
+  const [currentYear, setCurrentYear] = useState(2025);
+  
+  useEffect(() => {
+    setCurrentYear(new Date().getFullYear());
+  }, []);
 
   return (
     <footer className="relative bg-base-100 border-t border-base-200 overflow-hidden">

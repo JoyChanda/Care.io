@@ -18,8 +18,8 @@ export default function LayoutWrapper({
     "/about",
     "/contact",
     "/our-team",
-    "/auth/login",
-    "/auth/register",
+    "/login",
+    "/register",
     "/admin",
     "/admin/payment-history",
   ];
