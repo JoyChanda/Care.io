@@ -20,6 +20,8 @@ export default function LayoutWrapper({
     "/our-team",
     "/auth/login",
     "/auth/register",
+    "/admin",
+    "/admin/payment-history",
   ];
 
   const isDynamicService = pathname.startsWith("/services/");

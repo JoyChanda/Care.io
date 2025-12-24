@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { dbConnect } from "@/lib/dbConnect";
 import Booking from "@/models/Booking";
-import { sendInvoice } from "@/utils/sendInvoice";
+import { sendInvoiceEmail } from "@/lib/sendEmail";
 
 export async function POST(req: Request) {
   try {
@@ -20,7 +20,11 @@ export async function POST(req: Request) {
 
     // Send email invoice asynchronously
     try {
-      await sendInvoice(body.userEmail, booking);
+      await sendInvoiceEmail(body.userEmail, {
+        serviceName: body.service,
+        duration: `${body.duration} Days`,
+        totalCost: body.totalCost
+      });
     } catch (emailError) {
       console.error("Email delivery failed:", emailError);
       // We don't fail the request if email fails, but we log it

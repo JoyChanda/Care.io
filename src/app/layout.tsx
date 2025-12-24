@@ -19,7 +19,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning className={inter.className}>
-      <body className="antialiased bg-base-100 text-base-content min-h-screen flex flex-col">
+      <body 
+        className="antialiased bg-base-100 text-base-content min-h-screen flex flex-col"
+        suppressHydrationWarning={true}
+      >
         <AuthProvider>
           <ThemeProviders>
             <LayoutWrapper>
