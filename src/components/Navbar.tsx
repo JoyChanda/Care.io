@@ -20,7 +20,6 @@ const authenticatedNavLinks = [
   { href: "/", label: "Home" },
   { href: "/services", label: "Services" },
   { href: "/my-bookings", label: "My Bookings" },
-  { href: "/profile", label: "Profile" },
   { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },
 ];

@@ -174,13 +174,6 @@ export default function UserMenu() {
                 label="Booking History" 
                 onClick={() => setIsOpen(false)}
               />
-              <DropdownItem 
-                variants={itemVariants}
-                href="/admin" 
-                icon={<Shield size={20} className="text-accent" />} 
-                label="Admin Dashboard" 
-                onClick={() => setIsOpen(false)}
-              />
             </div>
 
             {/* Footer / Logout */}

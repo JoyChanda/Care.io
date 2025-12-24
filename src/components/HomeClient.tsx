@@ -4,8 +4,12 @@ import { motion } from "framer-motion";
 import ServiceCard from "./ServiceCard";
 import { Users, Heart } from "lucide-react";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 
 export default function HomeClient() {
+  const { status } = useSession();
+  const isAuthenticated = status === "authenticated";
+
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
       
@@ -37,13 +41,15 @@ export default function HomeClient() {
         </p>
 
         <div className="mt-12 flex justify-center gap-4 flex-wrap">
-          <Link href="/login">
-            <button className="btn btn-primary px-10 h-16 rounded-2xl text-base font-black shadow-xl shadow-primary/20 hover:shadow-2xl hover:shadow-primary/30 transition-all">
-              Get Started Now
-            </button>
-          </Link>
+          {!isAuthenticated && (
+            <Link href="/login">
+              <button className="btn btn-primary px-10 h-16 rounded-2xl text-base font-black shadow-xl shadow-primary/20 hover:shadow-2xl hover:shadow-primary/30 transition-all">
+                Get Started Now
+              </button>
+            </Link>
+          )}
           <Link href="/services">
-            <button className="btn btn-outline btn-primary px-10 h-16 rounded-2xl text-base font-black border-2 hover:bg-primary/5 transition-all">
+            <button className={`btn px-10 h-16 rounded-2xl text-base font-black border-2 transition-all ${isAuthenticated ? 'btn-primary shadow-xl shadow-primary/20 hover:shadow-2xl hover:shadow-primary/30' : 'btn-outline btn-primary hover:bg-primary/5'}`}>
               Explore Services
             </button>
           </Link>
