@@ -4,6 +4,9 @@ import { Heart, SquareMenu, X } from "lucide-react";
 import Link from "next/link";
 import ThemeToggle from "../app/components/ThemeToggle";
 import { useState, useEffect } from "react";
+import { useSession, signOut } from "next-auth/react";
+import toast from "react-hot-toast";
+import UserMenu from "./UserMenu";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -13,7 +16,17 @@ const navLinks = [
   { href: "/contact", label: "Contact" },
 ];
 
+const authenticatedNavLinks = [
+  { href: "/", label: "Home" },
+  { href: "/services", label: "Services" },
+  { href: "/my-bookings", label: "My Bookings" },
+  { href: "/profile", label: "Profile" },
+  { href: "/about", label: "About" },
+  { href: "/contact", label: "Contact" },
+];
+
 export default function Navbar() {
+  const { data: session, status } = useSession();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
@@ -69,7 +82,7 @@ export default function Navbar() {
 
             {/* Desktop Navigation */}
             <div className="hidden lg:flex items-center gap-1">
-              {navLinks.map((link) => (
+              {(status === "authenticated" ? authenticatedNavLinks : navLinks).map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
@@ -82,22 +95,26 @@ export default function Navbar() {
 
             {/* Actions */}
             <div className="flex items-center gap-2 sm:gap-4">
-              <div className="hidden sm:block">
-                <ThemeToggle />
-              </div>
+              <ThemeToggle />
               <div className="flex items-center gap-2">
-                <Link
-                  href="/login"
-                  className="hidden md:inline-flex btn btn-ghost btn-sm px-4 font-semibold"
-                >
-                  Login
-                </Link>
-                <Link
-                  href="/register"
-                  className="btn btn-primary btn-sm sm:btn-md px-6 font-bold"
-                >
-                  Join Us
-                </Link>
+                {status === "authenticated" ? (
+                  <UserMenu />
+                ) : (
+                  <>
+                    <Link
+                      href="/login"
+                      className="hidden md:inline-flex btn btn-ghost btn-sm px-4 font-bold rounded-xl"
+                    >
+                      Login
+                    </Link>
+                    <Link
+                      href="/register"
+                      className="btn btn-primary btn-sm sm:btn-md px-6 font-black rounded-2xl shadow-lg shadow-primary/20"
+                    >
+                      Join
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -140,7 +157,7 @@ export default function Navbar() {
              </div>
              
              <nav className="flex flex-col gap-2">
-                {navLinks.map((link) => (
+                {(status === "authenticated" ? authenticatedNavLinks : navLinks).map((link) => (
                   <Link
                     key={link.href}
                     href={link.href}
@@ -155,8 +172,23 @@ export default function Navbar() {
 
           <div className="p-6 border-t border-base-200 bg-base-100" style={{ backgroundColor: 'hsl(var(--b1))' }}>
              <div className="grid grid-cols-2 gap-3">
-               <Link href="/login" onClick={closeMenu} className="btn btn-outline btn-block rounded-xl">Login</Link>
-               <Link href="/register" onClick={closeMenu} className="btn btn-primary btn-block rounded-xl">Join</Link>
+               {status === "authenticated" ? (
+                 <button 
+                  onClick={() => { 
+                    signOut(); 
+                    closeMenu();
+                    toast.success("You have been logged out successfully.");
+                  }} 
+                  className="btn btn-outline btn-block rounded-xl border-error text-error hover:bg-error/10 col-span-2"
+                >
+                  Logout
+                </button>
+               ) : (
+                 <>
+                  <Link href="/login" onClick={closeMenu} className="btn btn-outline btn-block rounded-xl">Login</Link>
+                  <Link href="/register" onClick={closeMenu} className="btn btn-primary btn-block rounded-xl">Join</Link>
+                 </>
+               )}
              </div>
           </div>
         </aside>

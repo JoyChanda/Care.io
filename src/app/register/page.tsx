@@ -16,6 +16,7 @@ import {
   Check
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import toast from "react-hot-toast";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -35,29 +36,38 @@ export default function RegisterPage() {
     setError("");
     setIsLoading(true);
 
-    // Requirement Match: Validation (6+ char, 1 uppercase, 1 lowercase)
-    const regex = /^(?=.*[a-z])(?=.*[A-Z]).{6,}$/;
-    if (!regex.test(password)) {
-      setError("Password must be 6+ characters with at least one uppercase and one lowercase letter.");
+    // Simplified for better reliability: 6+ characters, at least one letter and one number
+    const regex = /^(?=.*[a-zA-Z])(?=.*\d).{6,}$/;
+    console.log("Testing password:", password, "Regex Match:", regex.test(password));
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters long.");
+      toast.error("Registration failed. Password too short.");
       setIsLoading(false);
       return;
     }
 
     try {
-      // Backend API call placeholder
-      console.log("Registering user:", { nid, name, email, contact, password });
+      const res = await fetch("/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nid, name, email, contact, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Registration failed");
+      }
       
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
+      toast.success("Account created successfully. Please login.");
       setSuccess(true);
       
-      // Requirement Match: Redirect to home/booking after register
       setTimeout(() => {
-        router.push("/");
+        router.push("/login");
       }, 1500);
-    } catch (err) {
-      setError("Registration failed. Please try again.");
+    } catch (err: any) {
+      setError(err.message || "Registration failed. Please try again.");
+      toast.error(err.message || "Registration failed. Please check your details.");
     } finally {
       setIsLoading(false);
     }

@@ -13,8 +13,8 @@ import {
   AlertCircle
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-
 import { signIn } from "next-auth/react";
+import toast from "react-hot-toast";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -23,7 +23,7 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
 
   // Field states
-  const [email, setEmail] = useState("");
+  const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
 
   const handleGoogleLogin = () => {
@@ -39,22 +39,28 @@ export default function LoginPage() {
     try {
       const result = await signIn("credentials", {
         redirect: false,
-        email,
+        identifier,
         password,
       });
 
       if (result?.error) {
-        setError("Invalid email or password");
+        setError("Invalid email/phone or password");
+        toast.error("Invalid credentials. Please try again.");
         setIsLoading(false);
         return;
       }
 
+      toast.success("Login successful. Welcome back!");
       setSuccess(true);
       setTimeout(() => {
-        router.push("/");
+        // Check for callbackUrl in URL search params if needed, or default to home/dashboard
+        const urlParams = new URLSearchParams(window.location.search);
+        const callbackUrl = urlParams.get('callbackUrl') || "/";
+        router.push(callbackUrl);
       }, 1000);
     } catch (err) {
       setError("Login failed");
+      toast.error("Something went wrong. Please try again later.");
       setIsLoading(false);
     }
   };
@@ -145,18 +151,18 @@ export default function LoginPage() {
                 </div>
 
                 <form key="form" onSubmit={handleLogin} className="space-y-6">
-                {/* Email */}
+                {/* Email / Phone */}
                 <div className="space-y-2">
-                  <label className="text-xs font-black uppercase tracking-widest text-base-content/40 px-1">Email Address</label>
+                  <label className="text-xs font-black uppercase tracking-widest text-base-content/40 px-1">Email or Phone</label>
                   <div className="relative">
                     <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-base-content/30" size={18} />
                     <input 
-                      type="email"
+                      type="text"
                       className="input input-lg input-bordered w-full rounded-2xl pl-12 text-sm font-semibold focus:ring-4 focus:ring-primary/10 transition-all" 
-                      placeholder="hello@example.com" 
+                      placeholder="Email or Phone Number" 
                       required 
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      value={identifier}
+                      onChange={(e) => setIdentifier(e.target.value)}
                     />
                   </div>
                 </div>
@@ -210,7 +216,7 @@ export default function LoginPage() {
                 <div className="pt-6 text-center">
                   <p className="text-sm font-medium text-base-content/60">
                     Don't have an account?{" "}
-                    <Link href="/auth/register" className="text-primary font-black hover:underline underline-offset-4">
+                    <Link href="/register" className="text-primary font-black hover:underline underline-offset-4">
                       Register
                     </Link>
                   </p>

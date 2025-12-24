@@ -15,6 +15,10 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import toast from "react-hot-toast";
 
 interface Booking {
   id: number;
@@ -27,6 +31,16 @@ interface Booking {
 }
 
 export default function MyBookings() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      toast.error("Please login to view your bookings.");
+      router.push("/login?callbackUrl=/my-bookings");
+    }
+  }, [status, router]);
+
   const [bookings, setBookings] = useState<Booking[]>([
     {
       id: 1,
@@ -63,6 +77,7 @@ export default function MyBookings() {
         b.id === id ? { ...b, status: "Cancelled" } : b
       )
     );
+    toast.success("Booking cancelled successfully.");
   };
 
   const getStatusStyle = (status: Booking["status"]) => {
@@ -90,6 +105,14 @@ export default function MyBookings() {
         return <XCircle size={14} />;
     }
   };
+
+  if (status === "loading" || status === "unauthenticated") {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-base-100">
+        <span className="loading loading-spinner loading-lg text-primary"></span>
+      </div>
+    );
+  }
 
   return (
     <main className="min-h-screen py-24 sm:py-32 bg-base-100/50">

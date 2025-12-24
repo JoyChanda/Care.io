@@ -8,6 +8,7 @@ import {
 } from "@stripe/react-stripe-js";
 import { motion } from "framer-motion";
 import { AlertCircle, CheckCircle2 } from "lucide-react";
+import toast from "react-hot-toast";
 
 interface CheckoutFormProps {
   amount: number;
@@ -36,8 +37,10 @@ export default function CheckoutForm({ amount, onSuccess, onCancel }: CheckoutFo
 
     if (error) {
       setErrorMessage(error.message || "An unexpected error occurred.");
+      toast.error("Payment failed or cancelled. Please try again.");
       setIsProcessing(false);
     } else if (paymentIntent && paymentIntent.status === "succeeded") {
+      toast.success("Payment successful. Booking confirmed!");
       await onSuccess();
     }
   };

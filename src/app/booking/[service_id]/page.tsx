@@ -18,6 +18,7 @@ import { useSession } from "next-auth/react";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import CheckoutForm from "@/components/CheckoutForm";
+import toast from "react-hot-toast";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
@@ -36,17 +37,6 @@ export default function BookingPage({ params }: Props) {
   const { service_id } = use(params);
   const { data: session, status } = useSession();
 
-  // Requirement Match: Auth Guard
-  useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/auth/login");
-    }
-  }, [status, router]);
-
-  if (status === "loading") {
-    return <div className="min-h-screen flex items-center justify-center"><span className="loading loading-spinner loading-lg text-primary"></span></div>;
-  }
-
   const [days, setDays] = useState(1);
   const [division, setDivision] = useState("");
   const [district, setDistrict] = useState("");
@@ -58,6 +48,18 @@ export default function BookingPage({ params }: Props) {
   const [clientSecret, setClientSecret] = useState("");
   const [showCheckout, setShowCheckout] = useState(false);
 
+  // Requirement Match: Auth Guard (Moved after state hooks to fix Rules of Hooks)
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      toast.error("You must be logged in to book a service.");
+      router.push("/login?callbackUrl=/booking/" + service_id);
+    }
+  }, [status, router, service_id]);
+
+  if (status === "loading" || status === "unauthenticated") {
+    return <div className="min-h-screen flex items-center justify-center"><span className="loading loading-spinner loading-lg text-primary"></span></div>;
+  }
+
   const serviceData = serviceChargeMap[service_id] || { price: 0, type: "day" };
   const basePrice = serviceData.price;
   const totalCost = days * basePrice;
@@ -65,17 +67,20 @@ export default function BookingPage({ params }: Props) {
   const handleBooking = async () => {
     if (!division || !address) {
       setError("Please fill in all location details.");
+      toast.error("Please fill in all location details.");
       return;
     }
 
     setIsSubmitting(true);
     setError("");
 
+    const serviceName = service_id.split("-").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
+
     try {
       const response = await fetch("/api/payments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount: totalCost, serviceName }),
+        body: JSON.stringify({ amount: totalCost, serviceName: serviceName }),
       });
 
       const data = await response.json();
@@ -87,6 +92,7 @@ export default function BookingPage({ params }: Props) {
       }
     } catch (err: any) {
       setError(err.message);
+      toast.error("Failed to place booking. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -114,12 +120,14 @@ export default function BookingPage({ params }: Props) {
       });
 
       if (response.ok) {
+        toast.success("Booking placed successfully. Status: Pending");
         router.push("/my-bookings");
       } else {
         throw new Error("Failed to save booking record.");
       }
     } catch (err: any) {
       setError(err.message);
+      toast.error("Failed to place booking. Please try again.");
     }
   };
 

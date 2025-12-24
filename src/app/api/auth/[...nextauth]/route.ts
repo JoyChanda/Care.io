@@ -3,28 +3,57 @@ import GoogleProvider from "next-auth/providers/google";
 import { dbConnect } from "@/lib/dbConnect";
 import User from "@/models/User";
 
-// Validate environment variables
-if (!process.env.GOOGLE_CLIENT_ID) {
-  throw new Error("GOOGLE_CLIENT_ID is not set in environment variables");
-}
-if (!process.env.GOOGLE_CLIENT_SECRET) {
-  throw new Error("GOOGLE_CLIENT_SECRET is not set in environment variables");
-}
-if (!process.env.NEXTAUTH_SECRET) {
-  throw new Error("NEXTAUTH_SECRET is not set in environment variables");
-}
+import CredentialsProvider from "next-auth/providers/credentials";
+import bcrypt from "bcryptjs";
 
 const handler = NextAuth({
   providers: [
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      authorization: {
-        params: {
-          prompt: "consent",
-          access_type: "offline",
-          response_type: "code",
-        },
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
+    CredentialsProvider({
+      name: "Credentials",
+      credentials: {
+        identifier: { label: "Email or Phone", type: "text" },
+        password: { label: "Password", type: "password" },
+      },
+      async authorize(credentials) {
+        if (!credentials?.identifier || !credentials?.password) {
+          throw new Error("Invalid credentials");
+        }
+
+        await dbConnect();
+
+        const { identifier, password } = credentials;
+        let user;
+
+        // Check if identifier looks like an email
+        const isEmail = identifier.includes("@");
+
+        if (isEmail) {
+          user = await User.findOne({ email: identifier });
+        } else {
+          // Assume it's a phone number (checking 'contact' field)
+          user = await User.findOne({ contact: identifier });
+        }
+
+        if (!user || !user.password) {
+          throw new Error("Invalid credentials");
+        }
+
+        const isMatch = await bcrypt.compare(password, user.password);
+
+        if (!isMatch) {
+          throw new Error("Invalid credentials");
+        }
+
+        return {
+          id: (user as any)._id.toString(),
+          name: user.name,
+          email: user.email,
+          image: user.image,
+        };
       },
     }),
   ],
@@ -37,58 +66,67 @@ const handler = NextAuth({
     error: "/login",
   },
   callbacks: {
-    async signIn({ user, account, profile }) {
-      // Allow Google sign-in to proceed
+    async signIn({ user, account }) {
       if (account?.provider === "google") {
-        const { name, email, image } = user;
-        
-        // Validate email exists
-        if (!email) {
-          console.error("Google sign-in failed: No email provided");
-          return false;
-        }
-
         try {
-          await dbConnect();
-          const userExists = await User.findOne({ email });
+          // Destructure safely
+          const email = user?.email;
+          const name = user?.name;
+          const image = user?.image;
 
-          if (!userExists) {
-            await User.create({
-              name,
-              email,
-              image,
-            });
+          if (!email) {
+            console.error("Google login failed: Email not provided by Google");
+            return false; // This is a legitimate failure
           }
+
+          // Try to sync with DB, but don't block auth if it fails
+          try {
+            await dbConnect();
+            const userExists = await User.findOne({ email: email as string });
+
+            if (!userExists) {
+              await User.create({
+                name: name || (email as string).split('@')[0],
+                email,
+                image,
+              });
+              console.log("New Google user created:", email);
+            }
+          } catch (dbError) {
+            console.error("Non-blocking DB error during Google Sign-In:", dbError);
+          }
+          
+          return true;
         } catch (error) {
-          console.error("Error saving user to DB during Google Sign-In:", error);
-          // Don't block sign-in if DB save fails, but log it
-          // return false; // Uncomment if you want to block sign-in on DB error
+          console.error("Unexpected error in signIn callback:", error);
+          return true; // Fallback to allow login
         }
       }
       return true;
     },
-    async session({ session, token }) {
-      try {
-        if (session.user?.email) {
+    async jwt({ token, user }) {
+      if (user) {
+        try {
           await dbConnect();
-          const dbUser = await User.findOne({ email: session.user.email });
+          const dbUser = await User.findOne({ email: user.email as string });
           if (dbUser) {
-            (session.user as any).id = dbUser._id.toString();
+            token.id = (dbUser as any)._id.toString();
           }
+        } catch (error) {
+          console.error("JWT Callback Error:", error);
         }
-      } catch (error) {
-        console.error("Error fetching user session from DB:", error);
-      }
-      return session;
-    },
-    async jwt({ token, account, user }) {
-      if (account && user) {
-        token.accessToken = account.access_token;
       }
       return token;
     },
+    async session({ session, token }) {
+      if (token?.id && session.user) {
+        (session.user as any).id = token.id;
+      }
+      return session;
+    },
   },
-  debug: process.env.NODE_ENV === "development",
+  // Enable debug in development to see full error logs in terminal
+  debug: true,
 });
 
 export { handler as GET, handler as POST };
