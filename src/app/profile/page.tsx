@@ -3,7 +3,7 @@
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { User, Mail, ShieldCheck } from "lucide-react";
 import Link from "next/link";
@@ -11,6 +11,14 @@ import Link from "next/link";
 export default function ProfilePage() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  
+  const [imageUrl, setImageUrl] = useState("");
+
+  useEffect(() => {
+    if (session?.user?.image) {
+      setImageUrl(session.user.image);
+    }
+  }, [session]);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -111,6 +119,25 @@ export default function ProfilePage() {
                       <p className="text-sm font-semibold text-base-content/60 uppercase tracking-wider">Email</p>
                       <p className="text-base font-bold mt-1">{user?.email || "Not set"}</p>
                     </div>
+                  </div>
+
+                  {/* Profile Image URL (Optional) */}
+                  <div className="p-4 rounded-2xl bg-base-200/50 border border-base-200">
+                    <p className="text-sm font-semibold text-base-content/60 uppercase tracking-wider mb-2">
+                       Profile Image URL (Optional)
+                    </p>
+
+                    <input
+                      type="url"
+                      value={imageUrl}
+                      onChange={(e) => setImageUrl(e.target.value)}
+                      placeholder="https://example.com/image.jpg"
+                      className="input input-bordered w-full rounded-xl text-sm"
+                    />
+
+                    <p className="text-xs text-base-content/50 mt-2">
+                       Paste a valid image URL to update your profile picture.
+                    </p>
                   </div>
 
                   {(user as any)?.id && (

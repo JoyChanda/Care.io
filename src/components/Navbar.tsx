@@ -75,23 +75,25 @@ export default function Navbar() {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 lg:h-20 gap-4">
-            {/* Brand + Mobile trigger */}
-            <div className="flex items-center gap-4">
+            {/* Left Side: Hamburger + Logo (Mobile) / Logo (Desktop) */}
+            <div className="flex items-center gap-1.5 sm:gap-3">
+              {/* Hamburger: Only visible on mobile/tablet */}
               <button
-                className="btn btn-ghost btn-icon rounded-xl lg:!hidden flex items-center justify-center p-0 w-10 h-10"
+                className="btn btn-ghost btn-icon rounded-xl lg:!hidden flex items-center justify-center p-0 w-11 h-11 active:scale-90 transition-transform"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 aria-label="Toggle Navigation"
               >
-                {isMenuOpen ? <X size={24} /> : <SquareMenu size={24} strokeWidth={1.75} />}
+                {isMenuOpen ? <X size={26} /> : <SquareMenu size={26} strokeWidth={1.75} />}
               </button>
 
-              <Link href="/" className="flex items-center gap-3 group transition-transform active:scale-95">
-                <span className="flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-xl bg-primary/10 text-primary shadow-inner group-hover:bg-primary group-hover:text-primary-content transition-colors">
-                  <Heart size={20} fill="currentColor" />
+              {/* Brand Logo & Text */}
+              <Link href="/" className="flex items-center gap-1.5 sm:gap-3 group transition-transform active:scale-95">
+                <span className="flex h-8 w-8 sm:h-11 sm:w-11 items-center justify-center rounded-xl bg-primary/10 text-primary shadow-inner group-hover:bg-primary group-hover:text-primary-content transition-all duration-300">
+                  <Heart size={16} className="sm:size-5" fill="currentColor" />
                 </span>
-                <div className="flex flex-col leading-tight">
-                  <span className="text-base-content font-bold text-lg sm:text-xl tracking-tight">Care.IO</span>
-                  <span className="text-[10px] uppercase tracking-widest text-base-content/50 font-semibold">
+                <div className="flex flex-col leading-none">
+                  <span className="text-base-content font-black text-base sm:text-xl tracking-tight">Care.IO</span>
+                  <span className="text-[7px] sm:text-[9px] uppercase tracking-[0.2em] text-primary/70 font-semibold mt-0.5 sm:mt-1">
                     Trusted Care System
                   </span>
                 </div>
@@ -111,9 +113,11 @@ export default function Navbar() {
               ))}
             </div>
 
-            {/* Actions */}
+            {/* Right Side: Actions */}
             <div className="flex items-center gap-2 sm:gap-4">
-              <ThemeToggle />
+              <div className="hidden lg:block">
+                <ThemeToggle />
+              </div>
               <div className="flex items-center gap-2">
                 {status === "authenticated" ? (
                   <UserMenu />
@@ -121,15 +125,15 @@ export default function Navbar() {
                   <>
                     <Link
                       href="/login"
-                      className="hidden md:inline-flex btn btn-ghost btn-sm px-4 font-bold rounded-xl"
+                      className="hidden lg:inline-flex btn btn-ghost btn-sm px-4 font-bold rounded-xl"
                     >
                       Login
                     </Link>
                     <Link
                       href="/register"
-                      className="btn btn-primary btn-sm sm:btn-md px-6 font-black rounded-2xl shadow-lg shadow-primary/20"
+                      className="btn btn-primary btn-sm sm:btn-md px-5 sm:px-8 h-10 sm:h-12 text-sm sm:text-base font-semibold rounded-xl sm:rounded-2xl shadow-lg shadow-primary/20 whitespace-nowrap flex items-center justify-center"
                     >
-                      Join
+                      Join Us
                     </Link>
                   </>
                 )}
