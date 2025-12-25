@@ -156,12 +156,12 @@ export default function Navbar() {
           onClick={closeMenu}
         />
         <aside
-          className={`absolute left-0 top-0 h-full w-[300px] bg-base-100 border-r border-base-200 shadow-2xl transition-transform duration-300 ease-out flex flex-col z-[70] ${
+          className={`absolute left-0 top-0 h-full w-[300px] bg-base-100/80 backdrop-blur-xl border-r border-base-200 shadow-2xl transition-transform duration-300 ease-out flex flex-col z-[70] ${
             isMenuOpen ? "translate-x-0" : "-translate-x-full"
           }`}
           style={{ backgroundColor: 'hsl(var(--b1))' }}
         >
-          <div className="flex items-center justify-between p-6 border-b border-base-200 bg-base-100" style={{ backgroundColor: 'hsl(var(--b1))' }}>
+          <div className="flex items-center justify-between p-6 border-b border-base-200/50">
              <div className="flex items-center gap-3">
                <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
                  <Heart size={18} fill="currentColor" />
@@ -173,7 +173,7 @@ export default function Navbar() {
              </button>
           </div>
           
-          <div className="px-4 py-6 flex-grow overflow-y-auto bg-base-100" style={{ backgroundColor: 'hsl(var(--b1))' }}>
+          <div className="px-4 py-6 flex-grow overflow-y-auto">
              <div className="flex items-center justify-start px-4 mb-6 sm:hidden">
                <ThemeToggle />
              </div>
@@ -192,7 +192,7 @@ export default function Navbar() {
              </nav>
           </div>
 
-          <div className="p-6 border-t border-base-200 bg-base-100" style={{ backgroundColor: 'hsl(var(--b1))' }}>
+          <div className="p-6 border-t border-base-200/50">
              <div className="grid grid-cols-2 gap-3">
                {status === "authenticated" ? (
                  <button 

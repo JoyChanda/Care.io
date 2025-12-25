@@ -135,7 +135,7 @@ export default function UserMenu() {
             animate="visible"
             exit="hidden"
             variants={menuVariants}
-            className="absolute right-0 mt-3 w-72 origin-top-right rounded-[2rem] bg-base-100 shadow-[0_20px_60px_rgba(0,0,0,0.3)] border border-base-200 overflow-hidden z-[100] backdrop-blur-sm"
+            className="absolute right-0 mt-3 w-72 origin-top-right rounded-[2rem] bg-base-100/90 backdrop-blur-xl shadow-[0_20px_60px_rgba(0,0,0,0.3)] border border-base-200 overflow-hidden z-[100]"
           >
             {/* Header / User Info */}
             <div className="p-7 text-center bg-gradient-to-b from-primary/5 to-transparent border-b border-base-200/50">
