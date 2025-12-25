@@ -22,11 +22,13 @@ export default function LayoutWrapper({
     "/register",
     "/admin",
     "/admin/payment-history",
+    "/profile",
   ];
 
   const isDynamicService = pathname.startsWith("/services/");
   const isDynamicBooking = pathname.startsWith("/booking/");
-  const isKnownRoute = validRoutes.includes(pathname) || isDynamicService || isDynamicBooking;
+  const isProfile = pathname.startsWith("/profile");
+  const isKnownRoute = validRoutes.includes(pathname) || isDynamicService || isDynamicBooking || isProfile;
 
   // We show nav/footer for known routes. 
   // If it's a 404 (unknown route), we hide them.

@@ -5,18 +5,24 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { User, Mail, ShieldCheck } from "lucide-react";
+import { User, Mail, ShieldCheck, Save, Loader2 } from "lucide-react";
 import Link from "next/link";
+import toast from "react-hot-toast";
 
 export default function ProfilePage() {
-  const { data: session, status } = useSession();
+  const { data: session, status, update } = useSession();
   const router = useRouter();
   
+  const [name, setName] = useState("");
   const [imageUrl, setImageUrl] = useState("");
+  const [isUpdating, setIsUpdating] = useState(false);
 
   useEffect(() => {
-    if (session?.user?.image) {
-      setImageUrl(session.user.image);
+    if (session?.user) {
+      setName(session.user.name || "");
+      if (session.user.image) {
+        setImageUrl(session.user.image);
+      }
     }
   }, [session]);
 
@@ -25,6 +31,43 @@ export default function ProfilePage() {
       router.push("/login?callbackUrl=/profile");
     }
   }, [status, router]);
+
+  const handleUpdate = async () => {
+    setIsUpdating(true);
+    try {
+      const res = await fetch("/api/user/update", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name, // Send name even if unchanged to keep API simple or check if changed
+          image: imageUrl
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to update profile");
+      }
+
+      await update({
+        ...session,
+        user: {
+          ...session?.user,
+          name: data.user.name,
+          image: data.user.image,
+        },
+      });
+
+      toast.success("Profile updated successfully!");
+      router.refresh();
+      
+    } catch (error: any) {
+      toast.error(error.message);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
 
   if (status === "loading") {
     return (
@@ -68,13 +111,16 @@ export default function ProfilePage() {
             <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 mb-8 pb-8 border-b border-base-200">
               <div className="relative">
                 <div className="w-32 h-32 rounded-full overflow-hidden ring-4 ring-primary/20 shadow-lg">
-                  {user?.image ? (
-                    <Image
-                      src={user.image}
-                      alt="Profile image"
-                      width={128}
-                      height={128}
-                      className="object-cover"
+                  {/* Priority: New Image URL -> Session Image -> Placeholder */}
+                  {(imageUrl || user?.image) ? (
+                    <img
+                      src={imageUrl || user?.image || "/default-avatar.png"}
+                      alt="Profile"
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                         // Fallback logic could go here, or just let it break to default
+                         // For now, let's keep it simple or reset to default-avatar if provided URL is bad
+                      }}
                     />
                   ) : (
                     <div className="w-full h-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center text-primary text-4xl font-bold">
@@ -110,7 +156,13 @@ export default function ProfilePage() {
                   <div className="flex items-center justify-between p-4 rounded-2xl bg-base-200/50 border border-base-200">
                     <div>
                       <p className="text-sm font-semibold text-base-content/60 uppercase tracking-wider">Name</p>
-                      <p className="text-base font-bold mt-1">{user?.name || "Not set"}</p>
+                      {/* Make Name Editable */}
+                      <input 
+                        type="text" 
+                        value={name} 
+                        onChange={(e) => setName(e.target.value)}
+                        className="input input-sm input-ghost w-full font-bold text-base mt-1 -ml-2 p-2 h-auto focus:bg-base-100"
+                      />
                     </div>
                   </div>
                   
@@ -151,6 +203,27 @@ export default function ProfilePage() {
                     </div>
                   )}
                 </div>
+              </div>
+
+              {/* Save Button */}
+              <div className="pt-2">
+                 <button 
+                  onClick={handleUpdate}
+                  disabled={isUpdating}
+                  className="btn btn-primary w-full rounded-xl font-bold shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all active:scale-[0.98] flex justify-center items-center gap-2"
+                >
+                  {isUpdating ? (
+                    <>
+                      <Loader2 className="animate-spin" size={20} />
+                      Saving Changes...
+                    </>
+                  ) : (
+                    <>
+                      <Save size={20} />
+                      Save Changes
+                    </>
+                  )}
+                </button>
               </div>
 
               {/* Action Buttons */}
