@@ -143,7 +143,7 @@ export default function RegisterPage() {
                     <div className="relative">
                       <Fingerprint className="absolute left-4 top-1/2 -translate-y-1/2 text-base-content/30" size={18} />
                       <input 
-                        className="input input-lg input-bordered w-full rounded-2xl pl-12 text-sm font-semibold focus:ring-4 focus:ring-primary/10 transition-all" 
+                        className="input input-lg h-16 input-bordered w-full rounded-2xl pl-12 text-sm font-semibold focus:ring-4 focus:ring-primary/10 transition-all" 
                         placeholder="123456789" 
                         required 
                         value={nid}
@@ -175,7 +175,7 @@ export default function RegisterPage() {
                     <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-base-content/30" size={18} />
                     <input 
                       type="email"
-                      className="input input-lg input-bordered w-full rounded-2xl pl-12 text-sm font-semibold focus:ring-4 focus:ring-primary/10 transition-all" 
+                      className="input input-lg h-16 input-bordered w-full rounded-2xl pl-12 text-sm font-semibold focus:ring-4 focus:ring-primary/10 transition-all" 
                       placeholder="hello@example.com" 
                       required 
                       value={email}
@@ -190,7 +190,8 @@ export default function RegisterPage() {
                   <div className="relative">
                     <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-base-content/30" size={18} />
                     <input 
-                      className="input input-lg input-bordered w-full rounded-2xl pl-12 text-sm font-semibold focus:ring-4 focus:ring-primary/10 transition-all" 
+                      type="tel"
+                      className="input input-lg h-16 input-bordered w-full rounded-2xl pl-12 text-sm font-semibold focus:ring-4 focus:ring-primary/10 transition-all" 
                       placeholder="+880 1XXX XXXXXX" 
                       required 
                       value={contact}
