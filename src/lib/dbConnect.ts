@@ -1,12 +1,17 @@
 import mongoose from "mongoose";
 
-const MONGODB_URI = process.env.MONGODB_URI;
+const RAW_MONGODB_URI = process.env.MONGODB_URI;
 
-if (!MONGODB_URI) {
+if (!RAW_MONGODB_URI) {
   throw new Error(
     "Please define the MONGODB_URI environment variable inside .env.local"
   );
 }
+
+// Clean the URI: remove whitespace and fix common typos
+const MONGODB_URI = RAW_MONGODB_URI.trim()
+  .replace(/[\s\t\n\r]/g, '')
+  .replace(/\.net\.net/g, '.net');
 
 /**
  * Global is used here to maintain a cached connection across hot reloads

@@ -63,8 +63,14 @@ export default function LoginPage() {
       });
 
       if (result?.error) {
-        setError("Invalid email/phone or password");
-        toast.error("Invalid credentials. Please try again.");
+        // next-auth prefixes errors with 'CredentialsSignin' or similar in some versions,
+        // but often 'result.error' contains the actual message thrown if redirect is false.
+        const errorMessage = result.error.includes("Read more") 
+          ? "Invalid email/phone or password" 
+          : result.error;
+        
+        setError(errorMessage);
+        toast.error(errorMessage);
         setIsLoading(false);
         return;
       }

@@ -19,7 +19,7 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.identifier || !credentials?.password) {
-          throw new Error("Invalid credentials");
+          throw new Error("Missing credentials");
         }
 
         try {
@@ -30,21 +30,36 @@ export const authOptions: NextAuthOptions = {
 
           let user;
           if (isEmail) {
-            user = await User.findOne({ 
-              email: { $regex: new RegExp(`^${ cleanIdentifier }$`, "i") } 
-            });
+            const normalizedIdentifier = cleanIdentifier.toLowerCase();
+            // Use exact match for email since we normalize on registration
+            user = await User.findOne({ email: normalizedIdentifier });
+            
+            // Fallback to regex if exact match fails (to handle existing users if any)
+            if (!user) {
+              user = await User.findOne({ 
+                email: { $regex: new RegExp(`^${normalizedIdentifier.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i") } 
+              });
+            }
           } else {
             user = await User.findOne({ contact: cleanIdentifier });
           }
 
-          if (!user || !user.password) {
-            return null;
+          if (!user) {
+            throw new Error("User not found");
+          }
+
+          if (!user.password) {
+            // Check if this is likely a Google user
+            if (user.email && !user.password) {
+              throw new Error("Please sign in with Google for this account");
+            }
+            throw new Error("Account has no password set");
           }
 
           const isMatch = await bcrypt.compare(credentials.password, user.password);
 
           if (!isMatch) {
-            return null;
+            throw new Error("Incorrect password");
           }
 
           return {
@@ -53,9 +68,11 @@ export const authOptions: NextAuthOptions = {
             email: user.email,
             image: user.image,
           };
-        } catch (error) {
-          console.error("Auth Error:", error);
-          return null;
+        } catch (error: any) {
+          console.error("Auth Error:", error.message);
+          // Throwing the error here will cause NextAuth to return it to the client
+          // in the 'error' property of the signIn result
+          throw new Error(error.message || "Authentication failed");
         }
       },
     }),
