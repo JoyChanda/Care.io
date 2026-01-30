@@ -52,9 +52,12 @@ export async function POST(req: Request) {
       { status: 201 }
     );
   } catch (error: any) {
-    console.error("Full Registration Error:", error);
+    console.error("Full Registration Error Details:");
+    console.error("- Message:", error.message);
+    console.error("- Stack:", error.stack);
+    
     return NextResponse.json(
-      { error: error.message || "Internal Server Error" },
+      { error: `Internal Server Error: ${error.message}` },
       { status: 500 }
     );
   }

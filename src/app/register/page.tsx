@@ -163,6 +163,7 @@ export default function RegisterPage() {
                         required 
                         value={name}
                         onChange={(e) => setName(e.target.value)}
+                        autoComplete="name"
                       />
                     </div>
                   </div>
@@ -180,6 +181,7 @@ export default function RegisterPage() {
                       required 
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
+                      autoComplete="email"
                     />
                   </div>
                 </div>
@@ -196,6 +198,7 @@ export default function RegisterPage() {
                       required 
                       value={contact}
                       onChange={(e) => setContact(e.target.value)}
+                      autoComplete="tel"
                     />
                   </div>
                 </div>
@@ -215,6 +218,7 @@ export default function RegisterPage() {
                         required
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
+                        autoComplete="new-password"
                       />
                       <button
                         type="button"
@@ -239,6 +243,7 @@ export default function RegisterPage() {
                         required
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
+                        autoComplete="new-password"
                       />
                       <button
                         type="button"

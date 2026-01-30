@@ -1,24 +1,9 @@
 import mongoose from "mongoose";
 
-const RAW_MONGODB_URI = process.env.MONGODB_URI;
-
-if (!RAW_MONGODB_URI) {
-  throw new Error(
-    "Please define the MONGODB_URI environment variable inside .env.local"
-  );
-}
-
-// Clean the URI: remove whitespace and fix common typos
-const MONGODB_URI = RAW_MONGODB_URI.trim()
-  .replace(/[\s\t\n\r]/g, '')
-  .replace(/\.net\.net/g, '.net');
-
 /**
  * Global is used here to maintain a cached connection across hot reloads
  * in development. This prevents connections from growing exponentially
  * during API Route usage.
- * 
- * Type definition for mongoose cache
  */
 interface MongooseCache {
   conn: typeof mongoose | null;
@@ -36,6 +21,22 @@ if (!global.mongoose) {
 }
 
 export async function dbConnect(): Promise<typeof mongoose> {
+  const RAW_MONGODB_URI = process.env.MONGODB_URI;
+
+  if (!RAW_MONGODB_URI) {
+    throw new Error(
+      "Please define the MONGODB_URI environment variable inside .env.local"
+    );
+  }
+
+  // Clean the URI: remove whitespace, fix double .net, and strip surrounding quotes
+  const MONGODB_URI = RAW_MONGODB_URI.trim()
+    .replace(/[\s\t\n\r]/g, '')
+    .replace(/\.net\.net/g, '.net')
+    .replace(/^["']|["']$/g, '');
+
+  console.log("Connecting to MongoDB with URI:", MONGODB_URI.replace(/:\/\/.*@/, "://****:****@"));
+
   if (cached.conn) {
     return cached.conn;
   }
@@ -70,4 +71,4 @@ export async function dbConnect(): Promise<typeof mongoose> {
   }
 
   return cached.conn;
-};
+}
