@@ -42,7 +42,8 @@ export default function RegisterPage() {
     setIsLoading(true);
 
     // Simplified for better reliability: 6+ characters, at least one letter and one number
-    const regex = /^(?=.*[a-zA-Z])(?=.*\d).{6,}$/;
+    // Requirements: 6+ characters, at least one uppercase, one lowercase, and one number
+    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/;
     console.log("Testing password:", password, "Regex Match:", regex.test(password));
     if (password.length < 6) {
       setError("Password must be at least 6 characters long.");
@@ -256,7 +257,7 @@ export default function RegisterPage() {
                   </div>
                 </div>
                 <p className="text-[10px] text-base-content/40 font-medium px-1 italic -mt-4">
-                  Must be 6+ characters with at least one letter and one number.
+                  Must be 6+ characters with at least one uppercase, one lowercase, and one number.
                 </p>
 
                 {error && (

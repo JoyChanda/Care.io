@@ -13,14 +13,28 @@ type Payment = {
   amount: number;
   date: string;
   status: "Pending" | "Confirmed" | "Completed" | "Cancelled";
+  location: string;
 };
 
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+
 export default function PaymentHistory() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const [payments, setPayments] = useState<Payment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
+    if (status === "loading") return;
+    if (status === "unauthenticated" || (session?.user as any)?.role !== "admin") {
+      router.push("/login?callbackUrl=/admin/payment-history");
+    }
+  }, [status, session, router]);
+
+  useEffect(() => {
+    if (status !== "authenticated" || (session?.user as any)?.role !== "admin") return;
     const fetchPayments = async () => {
       try {
         const res = await fetch("/api/bookings");
@@ -33,6 +47,7 @@ export default function PaymentHistory() {
             amount: b.totalCost,
             date: new Date(b.createdAt).toLocaleDateString(),
             status: b.status,
+            location: [b.area, b.city, b.district].filter(Boolean).join(', ') || b.division || "N/A",
           }));
           setPayments(transformed);
         } else {
@@ -116,6 +131,7 @@ export default function PaymentHistory() {
                   <th className="px-8 py-6 text-xs font-black uppercase tracking-widest text-base-content/40 border-b border-base-200">User / Customer</th>
                   <th className="px-8 py-6 text-xs font-black uppercase tracking-widest text-base-content/40 border-b border-base-200">Service Type</th>
                   <th className="px-8 py-6 text-xs font-black uppercase tracking-widest text-base-content/40 border-b border-base-200">Amount</th>
+                  <th className="px-8 py-6 text-xs font-black uppercase tracking-widest text-base-content/40 border-b border-base-200">Location</th>
                   <th className="px-8 py-6 text-xs font-black uppercase tracking-widest text-base-content/40 border-b border-base-200">Date</th>
                   <th className="px-8 py-6 text-xs font-black uppercase tracking-widest text-base-content/40 border-b border-base-200">Status</th>
                 </tr>
@@ -146,23 +162,82 @@ export default function PaymentHistory() {
                       <span className="font-black text-base">৳{p.amount.toLocaleString()}</span>
                     </td>
                     <td className="px-8 py-6 border-b border-base-200">
+                      <div className="flex items-center gap-2 text-xs font-medium text-base-content/60">
+                        {p.location}
+                      </div>
+                    </td>
+                    <td className="px-8 py-6 border-b border-base-200">
                       <div className="flex items-center gap-2 text-sm font-medium text-base-content/60">
                         <Calendar size={14} />
                         {p.date}
                       </div>
                     </td>
                     <td className="px-8 py-6 border-b border-base-200">
-                      <span
-                        className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold border transition-all ${
-                          p.status === "Completed" || p.status === "Confirmed"
-                            ? "bg-green-500/10 text-green-600 border-green-200"
-                            : p.status === "Pending"
-                            ? "bg-amber-500/10 text-amber-600 border-amber-200"
-                            : "bg-rose-500/10 text-rose-600 border-rose-200"
-                        }`}
-                      >
-                        {p.status}
-                      </span>
+                      <div className="flex items-center gap-3">
+                        {p.status === "Pending" ? (
+                          <button
+                            onClick={async () => {
+                              try {
+                                const res = await fetch("/api/bookings", {
+                                  method: "PATCH",
+                                  headers: { "Content-Type": "application/json" },
+                                  body: JSON.stringify({ id: p.id, status: "Confirmed" }),
+                                });
+                                if (res.ok) {
+                                  setPayments(payments.map(item => item.id === p.id ? { ...item, status: "Confirmed" } : item));
+                                  toast.success("Booking Confirmed! ✅");
+                                } else {
+                                  throw new Error("Failed to update status");
+                                }
+                              } catch (err) {
+                                toast.error("Failed to confirm booking");
+                              }
+                            }}
+                            className="btn btn-xs btn-success rounded-full px-4 font-black uppercase tracking-tighter"
+                          >
+                            Confirm
+                          </button>
+                        ) : (
+                          <span className={`px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${
+                            p.status === "Completed" || p.status === "Confirmed"
+                              ? "bg-green-500/10 text-green-600 border-green-200"
+                              : p.status === "Cancelled"
+                              ? "bg-rose-500/10 text-rose-600 border-rose-200"
+                              : "bg-amber-500/10 text-amber-600 border-amber-200"
+                          }`}>
+                            {p.status}
+                          </span>
+                        )}
+
+                        {/* Dropdown for other status changes */}
+                        <select
+                          value={p.status}
+                          onChange={async (e) => {
+                            const newStatus = e.target.value as Payment["status"];
+                            try {
+                              const res = await fetch("/api/bookings", {
+                                method: "PATCH",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({ id: p.id, status: newStatus }),
+                              });
+                              if (res.ok) {
+                                setPayments(payments.map(item => item.id === p.id ? { ...item, status: newStatus } : item));
+                                toast.success(`Status updated to ${newStatus}`);
+                              } else {
+                                throw new Error("Failed to update status");
+                              }
+                            } catch (err) {
+                              toast.error("Failed to update status");
+                            }
+                          }}
+                          className="select select-ghost select-xs opacity-0 hover:opacity-100 transition-opacity w-8 p-0 min-h-0 h-6"
+                        >
+                          <option value="Pending">Pending</option>
+                          <option value="Confirmed">Confirmed</option>
+                          <option value="Completed">Completed</option>
+                          <option value="Cancelled">Cancelled</option>
+                        </select>
+                      </div>
                     </td>
                   </tr>
                 ))}

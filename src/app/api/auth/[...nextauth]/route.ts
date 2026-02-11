@@ -22,6 +22,16 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Missing credentials");
         }
 
+        // Hardcoded Admin Check for development convenience
+        if (credentials.identifier === "admin@care.io" && credentials.password === "Admin1234") {
+          return {
+            id: "admin-system-id",
+            name: "Super Admin",
+            email: "admin@care.io",
+            role: "admin",
+          };
+        }
+
         try {
           await dbConnect();
 
@@ -67,6 +77,7 @@ export const authOptions: NextAuthOptions = {
             name: user.name,
             email: user.email,
             image: user.image,
+            role: (user as any).role || "user",
           };
         } catch (error: any) {
           console.error("Auth Error:", error.message);
@@ -100,15 +111,17 @@ export const authOptions: NextAuthOptions = {
       }
       return true;
     },
-    async jwt({ token, user }) {
+    async jwt({ token, user }: any) {
       if (user) {
         token.id = user.id;
+        token.role = user.role;
       }
       return token;
     },
-    async session({ session, token }) {
+    async session({ session, token }: any) {
       if (token && session.user) {
         (session.user as any).id = token.id;
+        (session.user as any).role = token.role;
       }
       return session;
     },

@@ -248,7 +248,10 @@ export default function LoginPage() {
                 <div className="pt-6 text-center">
                   <p className="text-sm font-medium text-base-content/60">
                     Don't have an account?{" "}
-                    <Link href="/register" className="text-primary font-black hover:underline underline-offset-4">
+                    <Link 
+                      href={`/register${typeof window !== 'undefined' ? (new URLSearchParams(window.location.search).get('callbackUrl') ? `?callbackUrl=${new URLSearchParams(window.location.search).get('callbackUrl')}` : '') : ''}`} 
+                      className="text-primary font-black hover:underline underline-offset-4"
+                    >
                       Register
                     </Link>
                   </p>

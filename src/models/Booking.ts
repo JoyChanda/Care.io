@@ -4,6 +4,9 @@ export interface IBooking extends Document {
   service: string;
   duration: number;
   division: string;
+  district: string;
+  city: string;
+  area: string;
   address: string;
   totalCost: number;
   status: "Pending" | "Confirmed" | "Completed" | "Cancelled";
@@ -17,6 +20,9 @@ const BookingSchema: Schema = new Schema(
     service: { type: String, required: true },
     duration: { type: Number, required: true },
     division: { type: String, required: true },
+    district: { type: String, required: true },
+    city: { type: String, required: true },
+    area: { type: String, required: true },
     address: { type: String, required: true },
     totalCost: { type: Number, required: true },
     status: {

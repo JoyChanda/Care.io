@@ -20,8 +20,13 @@ export async function POST(req: Request) {
 
     // Send email invoice asynchronously
     try {
+      const formattedServiceName = body.service
+        .split("-")
+        .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" ");
+
       await sendInvoiceEmail(body.userEmail, {
-        serviceName: body.service,
+        serviceName: formattedServiceName,
         duration: `${body.duration} Days`,
         totalCost: body.totalCost
       });

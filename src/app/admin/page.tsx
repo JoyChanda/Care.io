@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { 
   LayoutDashboard, 
   CreditCard, 
@@ -15,6 +17,8 @@ import {
 import { motion } from "framer-motion";
 
 export default function AdminDashboard() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const [stats, setStats] = useState({
     totalBookings: 0,
     totalRevenue: 0,
@@ -23,6 +27,14 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (status === "loading") return;
+    if (status === "unauthenticated" || (session?.user as any)?.role !== "admin") {
+      router.push("/login?callbackUrl=/admin");
+    }
+  }, [status, session, router]);
+
+  useEffect(() => {
+    if (status !== "authenticated" || (session?.user as any)?.role !== "admin") return;
     const fetchStats = async () => {
       try {
         const res = await fetch("/api/admin/stats");

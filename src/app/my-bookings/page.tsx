@@ -57,7 +57,7 @@ export default function MyBookings() {
             id: b._id,
             service: b.service.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
             duration: b.duration,
-            location: `${b.area}, ${b.city}, ${b.district}`,
+            location: [b.area, b.city, b.district].filter(Boolean).join(', ') || b.division || 'Location pending',
             total: b.totalCost,
             status: b.status,
             date: new Date(b.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
@@ -217,7 +217,7 @@ export default function MyBookings() {
                         </div>
                       </td>
                       <td className="px-8 py-6 border-b border-base-200 text-center">
-                        {b.status === "Pending" ? (
+                        {(b.status === "Pending" || b.status === "Confirmed") ? (
                           <button
                             onClick={() => cancelBooking(b.id)}
                             className="btn btn-sm btn-error btn-outline rounded-xl font-bold px-4"
