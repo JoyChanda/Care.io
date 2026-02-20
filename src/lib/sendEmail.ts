@@ -36,11 +36,12 @@ export const sendInvoiceEmail = async (to: string, booking: any, isUpdate = fals
           <div style="background-color: #f3f4f6; padding: 25px; border-radius: 16px; margin: 25px 0;">
             <p style="margin: 5px 0; font-size: 14px; text-transform: uppercase; color: #6b7280; font-weight: bold;">Booking Details</p>
             <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 10px 0;" />
+            <p style="margin: 8px 0;"><strong>Booking ID:</strong> <span style="font-family: monospace; background: #e5e7eb; padding: 2px 6px; border-radius: 4px;">${booking.bookingId}</span></p>
             <p style="margin: 8px 0;"><strong>Service:</strong> ${booking.serviceName}</p>
             <p style="margin: 8px 0;"><strong>Duration:</strong> ${booking.duration}</p>
             <p style="margin: 8px 0;"><strong>Total Cost:</strong> ৳${booking.totalCost.toLocaleString()}</p>
             <p style="margin: 8px 0;"><strong>Current Status:</strong> <span style="color: ${isConfirmed ? '#10b981' : '#f59e0b'}; font-weight: bold;">${booking.status}</span></p>
-            <p style="margin: 8px 0;"><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
+            <p style="margin: 8px 0;"><strong>Date:</strong> ${booking.date}</p>
           </div>
 
           <p>Our care provider will reach out to you shortly for further coordination.</p>

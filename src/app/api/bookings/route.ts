@@ -26,10 +26,12 @@ export async function POST(req: Request) {
         .join(" ");
 
       await sendInvoiceEmail(body.userEmail, {
+        bookingId: (booking as any)._id,
         serviceName: formattedServiceName,
         duration: `${body.duration} Days`,
         totalCost: body.totalCost,
-        status: (booking as any).status
+        status: (booking as any).status,
+        date: new Date((booking as any).createdAt).toLocaleDateString()
       });
     } catch (emailError) {
       console.error("Email delivery failed:", emailError);
@@ -98,10 +100,12 @@ export async function PATCH(req: Request) {
           .join(" ");
 
         await sendInvoiceEmail(doc.userEmail, {
+          bookingId: doc._id,
           serviceName: formattedServiceName,
           duration: `${doc.duration} Days`,
           totalCost: doc.totalCost,
-          status: "Confirmed"
+          status: "Confirmed",
+          date: new Date(doc.createdAt).toLocaleDateString()
         }, true);
       } catch (emailError) {
         console.error("Confirmation email failed:", emailError);
