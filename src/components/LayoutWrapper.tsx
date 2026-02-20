@@ -1,6 +1,7 @@
 "use client";
 
 import Navbar from "../components/Navbar";
+import AdminNavbar from "../app/admin/components/AdminNavbar";
 import Footer from "../components/Footer";
 import { usePathname } from "next/navigation";
 
@@ -10,6 +11,7 @@ export default function LayoutWrapper({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const isAdminRoute = pathname.startsWith("/admin");
   
   const validRoutes = [
     "/",
@@ -22,6 +24,8 @@ export default function LayoutWrapper({
     "/register",
     "/admin",
     "/admin/payment-history",
+    "/admin/users",
+    "/admin/system-health",
     "/profile",
   ];
 
@@ -36,11 +40,11 @@ export default function LayoutWrapper({
 
   return (
     <>
-      {showNavFooter && <Navbar />}
+      {showNavFooter && (isAdminRoute ? <AdminNavbar /> : <Navbar />)}
       <main className="flex-grow">
         {children}
       </main>
-      {showNavFooter && <Footer />}
+      {showNavFooter && !isAdminRoute && <Footer />}
     </>
   );
 }

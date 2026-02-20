@@ -77,6 +77,9 @@ export default function MyBookings() {
   }, [session, status]);
 
   const cancelBooking = async (id: string) => {
+    if (!window.confirm("Are you sure you want to cancel this booking?")) return;
+    
+    const toastId = toast.loading("Cancelling booking...");
     try {
       const res = await fetch("/api/bookings", {
         method: "PATCH",
@@ -85,17 +88,13 @@ export default function MyBookings() {
       });
 
       if (res.ok) {
-        setBookings(
-          bookings.map((b) =>
-            b.id === id ? { ...b, status: "Cancelled" } : b
-          )
-        );
-        toast.success("Booking cancelled successfully.");
+        setBookings(prev => prev.map(b => b.id === id ? { ...b, status: "Cancelled" } : b));
+        toast.success("Booking cancelled.", { id: toastId });
       } else {
-        throw new Error("Failed to cancel booking");
+        throw new Error("Server error");
       }
     } catch (err) {
-      toast.error("Failed to cancel booking. Please try again.");
+      toast.error("Failed to cancel.", { id: toastId });
     }
   };
 
@@ -217,22 +216,17 @@ export default function MyBookings() {
                         </div>
                       </td>
                       <td className="px-8 py-6 border-b border-base-200 text-center">
-                        {(b.status === "Pending" || b.status === "Confirmed") ? (
+                        {b.status === "Pending" ? (
                           <button
                             onClick={() => cancelBooking(b.id)}
-                            className="btn btn-sm btn-error btn-outline rounded-xl font-bold px-4"
+                            className="btn btn-sm btn-error btn-outline rounded-xl font-bold px-4 hover:bg-error hover:text-white transition-all uppercase tracking-tighter text-[10px]"
                           >
                             Cancel
                           </button>
-                        ) : b.status === "Cancelled" ? (
-                          <span className="text-xs text-base-content/30 font-bold">No actions</span>
                         ) : (
-                          <Link 
-                            href={`/services/${b.service.toLowerCase().replace(' ', '-')}`} 
-                            className="btn btn-sm btn-primary btn-outline rounded-xl font-bold px-4"
-                          >
-                            View Details
-                          </Link>
+                          <span className="text-[10px] font-black uppercase tracking-widest text-base-content/20 italic">
+                            {b.status === "Cancelled" ? "No Actions" : b.status}
+                          </span>
                         )}
                       </td>
                     </motion.tr>

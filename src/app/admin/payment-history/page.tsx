@@ -27,14 +27,6 @@ export default function PaymentHistory() {
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-    if (status === "loading") return;
-    if (status === "unauthenticated" || (session?.user as any)?.role !== "admin") {
-      router.push("/login?callbackUrl=/admin/payment-history");
-    }
-  }, [status, session, router]);
-
-  useEffect(() => {
-    if (status !== "authenticated" || (session?.user as any)?.role !== "admin") return;
     const fetchPayments = async () => {
       try {
         const res = await fetch("/api/bookings");
@@ -174,42 +166,6 @@ export default function PaymentHistory() {
                     </td>
                     <td className="px-8 py-6 border-b border-base-200">
                       <div className="flex items-center gap-3">
-                        {p.status === "Pending" ? (
-                          <button
-                            onClick={async () => {
-                              try {
-                                const res = await fetch("/api/bookings", {
-                                  method: "PATCH",
-                                  headers: { "Content-Type": "application/json" },
-                                  body: JSON.stringify({ id: p.id, status: "Confirmed" }),
-                                });
-                                if (res.ok) {
-                                  setPayments(payments.map(item => item.id === p.id ? { ...item, status: "Confirmed" } : item));
-                                  toast.success("Booking Confirmed! ✅");
-                                } else {
-                                  throw new Error("Failed to update status");
-                                }
-                              } catch (err) {
-                                toast.error("Failed to confirm booking");
-                              }
-                            }}
-                            className="btn btn-xs btn-success rounded-full px-4 font-black uppercase tracking-tighter"
-                          >
-                            Confirm
-                          </button>
-                        ) : (
-                          <span className={`px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${
-                            p.status === "Completed" || p.status === "Confirmed"
-                              ? "bg-green-500/10 text-green-600 border-green-200"
-                              : p.status === "Cancelled"
-                              ? "bg-rose-500/10 text-rose-600 border-rose-200"
-                              : "bg-amber-500/10 text-amber-600 border-amber-200"
-                          }`}>
-                            {p.status}
-                          </span>
-                        )}
-
-                        {/* Dropdown for other status changes */}
                         <select
                           value={p.status}
                           onChange={async (e) => {
@@ -222,7 +178,7 @@ export default function PaymentHistory() {
                               });
                               if (res.ok) {
                                 setPayments(payments.map(item => item.id === p.id ? { ...item, status: newStatus } : item));
-                                toast.success(`Status updated to ${newStatus}`);
+                                toast.success(`Booking ${newStatus}! ✅`);
                               } else {
                                 throw new Error("Failed to update status");
                               }
@@ -230,7 +186,15 @@ export default function PaymentHistory() {
                               toast.error("Failed to update status");
                             }
                           }}
-                          className="select select-ghost select-xs opacity-0 hover:opacity-100 transition-opacity w-8 p-0 min-h-0 h-6"
+                          className={`select select-xs rounded-full px-4 font-black uppercase tracking-tighter border-2 transition-all ${
+                            p.status === "Pending" 
+                              ? "bg-amber-500/10 text-amber-600 border-amber-200 focus:bg-amber-500 focus:text-white" 
+                              : p.status === "Confirmed"
+                              ? "bg-blue-500/10 text-blue-600 border-blue-200 focus:bg-blue-500 focus:text-white"
+                              : p.status === "Completed"
+                              ? "bg-green-500/10 text-green-600 border-green-200 focus:bg-green-500 focus:text-white"
+                              : "bg-rose-500/10 text-rose-600 border-rose-200 focus:bg-rose-500 focus:text-white"
+                          }`}
                         >
                           <option value="Pending">Pending</option>
                           <option value="Confirmed">Confirmed</option>

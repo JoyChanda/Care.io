@@ -28,7 +28,8 @@ export async function POST(req: Request) {
       await sendInvoiceEmail(body.userEmail, {
         serviceName: formattedServiceName,
         duration: `${body.duration} Days`,
-        totalCost: body.totalCost
+        totalCost: body.totalCost,
+        status: (booking as any).status
       });
     } catch (emailError) {
       console.error("Email delivery failed:", emailError);
@@ -86,6 +87,25 @@ export async function PATCH(req: Request) {
         { error: "Booking not found" },
         { status: 404 }
       );
+    }
+
+    if (status === "Confirmed") {
+      try {
+        const doc = updatedBooking as any;
+        const formattedServiceName = doc.service
+          .split("-")
+          .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(" ");
+
+        await sendInvoiceEmail(doc.userEmail, {
+          serviceName: formattedServiceName,
+          duration: `${doc.duration} Days`,
+          totalCost: doc.totalCost,
+          status: "Confirmed"
+        }, true);
+      } catch (emailError) {
+        console.error("Confirmation email failed:", emailError);
+      }
     }
 
     return NextResponse.json(updatedBooking);

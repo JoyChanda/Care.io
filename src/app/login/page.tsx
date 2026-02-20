@@ -28,6 +28,7 @@ export default function LoginPage() {
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [callbackUrl, setCallbackUrl] = useState("");
 
   // Catch URL errors during mount
   useEffect(() => {
@@ -43,6 +44,9 @@ export default function LoginPage() {
       }
       toast.error(`Sign-in problem: ${urlError}`);
     }
+    
+    // Set callback URL safely on mount
+    setCallbackUrl(params.get("callbackUrl") || "");
   }, []);
 
   const handleGoogleLogin = () => {
@@ -249,7 +253,7 @@ export default function LoginPage() {
                   <p className="text-sm font-medium text-base-content/60">
                     Don't have an account?{" "}
                     <Link 
-                      href={`/register${typeof window !== 'undefined' ? (new URLSearchParams(window.location.search).get('callbackUrl') ? `?callbackUrl=${new URLSearchParams(window.location.search).get('callbackUrl')}` : '') : ''}`} 
+                      href={`/register${callbackUrl ? `?callbackUrl=${callbackUrl}` : ''}`} 
                       className="text-primary font-black hover:underline underline-offset-4"
                     >
                       Register

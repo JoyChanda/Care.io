@@ -130,8 +130,11 @@ export default function ContactPage() {
 
                 <div className="space-y-2">
                   <label className="text-xs font-black uppercase tracking-widest text-base-content/40 ml-1">Message Subject</label>
-                  <select className="select select-lg select-bordered w-full rounded-2xl font-bold focus:ring-4 focus:ring-primary/10 transition-all bg-base-200/50">
-                    <option disabled selected>Select a subject</option>
+                  <select 
+                    defaultValue="default"
+                    className="select select-lg select-bordered w-full rounded-2xl font-bold focus:ring-4 focus:ring-primary/10 transition-all bg-base-200/50"
+                  >
+                    <option value="default" disabled>Select a subject</option>
                     <option>Service Inquiry</option>
                     <option>Account Support</option>
                     <option>Billing Question</option>

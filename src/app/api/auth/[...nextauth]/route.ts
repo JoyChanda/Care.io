@@ -100,7 +100,8 @@ export const authOptions: NextAuthOptions = {
               name: user.name,
               email: user.email,
               image: user.image,
-              password: "", // Google users don't have a local password initially
+              password: "",
+              role: user.email === "admin@care.io" ? "admin" : "user",
             });
           }
           return true;
